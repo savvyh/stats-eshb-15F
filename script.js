@@ -765,13 +765,20 @@ function updateStatsInterface() {
   const exerciseId = document.getElementById("statsExercise").value;
   const playerId = document.getElementById("statsPlayer").value;
 
-  if (!exerciseId) {
+  // Si aucune joueuse et aucun exercice sélectionnés
+  if (!exerciseId && !playerId) {
     document.getElementById("statsContent").innerHTML = `
             <div class="no-data">
-                <h3>📊 Sélectionnez un exercice pour voir les statistiques</h3>
+                <h3>📊 Sélectionnez un exercice ou une joueuse pour voir les statistiques</h3>
                 <p>Les graphiques d'évolution et de comparaison s'afficheront ici</p>
             </div>
         `;
+    return;
+  }
+
+  // Si seule une joueuse est sélectionnée (sans exercice)
+  if (!exerciseId && playerId) {
+    displayPlayerAllExercisesStats(playerId);
     return;
   }
 
@@ -876,7 +883,7 @@ function updateStatsInterface() {
             `;
     }
   } else {
-    // Toutes les joueuses - afficher le classement
+    // Toutes les joueuses - afficher uniquement le classement
     const playerStats = calculatePlayerStatsForExercise(exerciseId);
 
     statsHTML += `
@@ -917,78 +924,291 @@ function updateStatsInterface() {
             </div>
             
             <div class="performance-section">
-                <h3>📈 Détail par joueuse</h3>
-                ${playerStats
-                  .map(
-                    (stat) => `
-                    <div class="player-stat-card">
-                        <h4>${stat.playerName}</h4>
-                        <div class="player-stat-details">
-                            <div class="stat-row">
-                                <span class="stat-label">Meilleur score :</span>
-                                <span class="stat-value">${stat.bestScore} ${
-                      exercise.unit
-                    }</span>
-                            </div>
-                            <div class="stat-row">
-                                <span class="stat-label">Date du record :</span>
-                                <span class="stat-value">${new Date(
-                                  stat.bestDate
-                                ).toLocaleDateString("fr-FR")}</span>
-                            </div>
-                            <div class="stat-row">
-                                <span class="stat-label">Nombre de performances :</span>
-                                <span class="stat-value">${
-                                  stat.performanceCount
-                                }</span>
-                            </div>
-                            <div class="stat-row">
-                                <span class="stat-label">Score moyen :</span>
-                                <span class="stat-value">${stat.averageScore} ${
-                      exercise.unit
-                    }</span>
-                            </div>
-                        </div>
-                        
-                        <div class="recent-performances">
-                            <h5>Performances récentes :</h5>
-                            <div class="performance-mini-list">
-                                ${stat.recentPerformances
-                                  .map(
-                                    (perf) => `
-                                    <div class="mini-performance">
-                                        <span class="mini-date">${new Date(
-                                          perf.date
-                                        ).toLocaleDateString("fr-FR")}</span>
-                                        <span class="mini-score">${
-                                          perf.bestScore
-                                        } ${exercise.unit}</span>
-                                    </div>
-                                `
-                                  )
-                                  .join("")}
-                            </div>
-                        </div>
-                    </div>
-                `
-                  )
-                  .join("")}
+                <h3>💡 Conseil</h3>
+                <p>Sélectionnez une joueuse spécifique pour voir ses statistiques détaillées et son historique de performances.</p>
             </div>
         `;
   }
 
-  // Ajouter le graphique
-  statsHTML += `
+  // Ajouter le graphique uniquement si une joueuse est sélectionnée
+  if (playerId) {
+    statsHTML += `
         <div class="chart-container">
             <h3>Évolution des performances</h3>
             <canvas id="performanceChart" width="400" height="200"></canvas>
         </div>
     `;
+  }
 
   document.getElementById("statsContent").innerHTML = statsHTML;
 
-  // Créer le graphique
-  createPerformanceChart(exerciseId, playerId);
+  // Créer le graphique uniquement si une joueuse est sélectionnée
+  if (playerId) {
+    createPerformanceChart(exerciseId, playerId);
+  }
+}
+
+function displayPlayerAllExercisesStats(playerId) {
+  const player = players.find((p) => p.id === playerId);
+  const playerPerformances = performances.filter(
+    (p) => p.playerId === playerId
+  );
+
+  if (playerPerformances.length === 0) {
+    document.getElementById("statsContent").innerHTML = `
+      <div class="no-data">
+        <h3>📊 Aucune performance pour ${player.name}</h3>
+        <p>Cette joueuse n'a pas encore de performance enregistrée</p>
+      </div>
+    `;
+    return;
+  }
+
+  // Calculer les statistiques globales de la joueuse
+  const totalPerformances = playerPerformances.length;
+  const uniqueExercises = new Set(playerPerformances.map((p) => p.exerciseId))
+    .size;
+
+  let statsHTML = `
+    <div class="performance-section">
+      <h3>👤 Profil de ${player.name}</h3>
+      <div class="exercise-stats">
+        <div class="stat-item">
+          <div class="stat-value">${totalPerformances}</div>
+          <div class="stat-label">Total performances</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">${uniqueExercises}</div>
+          <div class="stat-label">Exercices pratiqués</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">${new Date(
+            player.registeredAt
+          ).toLocaleDateString("fr-FR")}</div>
+          <div class="stat-label">Inscrite le</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Grouper les performances par exercice
+  const performancesByExercise = {};
+  playerPerformances.forEach((perf) => {
+    if (!performancesByExercise[perf.exerciseId]) {
+      performancesByExercise[perf.exerciseId] = [];
+    }
+    performancesByExercise[perf.exerciseId].push(perf);
+  });
+
+  // Créer les statistiques par exercice
+  const exerciseStats = [];
+  Object.keys(performancesByExercise).forEach((exerciseId) => {
+    const exercise = exercises.find((e) => e.id === exerciseId);
+    const exercisePerformances = performancesByExercise[exerciseId];
+
+    // Trouver le meilleur score
+    const bestPerformance = exercisePerformances.reduce((best, current) => {
+      if (
+        exercise.type.includes("time") ||
+        exercise.type.includes("distance_short")
+      ) {
+        return current.bestScore < best.bestScore ? current : best;
+      } else {
+        return current.bestScore > best.bestScore ? current : best;
+      }
+    });
+
+    // Calculer la moyenne
+    const scores = exercisePerformances.map((p) => p.bestScore);
+    const exerciseAverage = (
+      scores.reduce((a, b) => a + b, 0) / scores.length
+    ).toFixed(2);
+
+    exerciseStats.push({
+      exercise: exercise,
+      bestScore: bestPerformance.bestScore,
+      bestDate: bestPerformance.date,
+      performanceCount: exercisePerformances.length,
+      averageScore: exerciseAverage,
+      recentPerformances: exercisePerformances
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, 3),
+    });
+  });
+
+  // Trier par nombre de performances (plus pratiqués en premier)
+  exerciseStats.sort((a, b) => b.performanceCount - a.performanceCount);
+
+  // Afficher les statistiques par exercice
+  statsHTML += `
+    <div class="performance-section">
+      <h3>🏆 Records par exercice</h3>
+      ${exerciseStats
+        .map(
+          (stat) => `
+        <div class="player-stat-card">
+          <h4>${stat.exercise.name}</h4>
+          <div class="player-stat-details">
+            <div class="stat-row">
+              <span class="stat-label">Record personnel :</span>
+              <span class="stat-value">${stat.bestScore} ${
+            stat.exercise.unit
+          }</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Date du record :</span>
+              <span class="stat-value">${new Date(
+                stat.bestDate
+              ).toLocaleDateString("fr-FR")}</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Nombre de performances :</span>
+              <span class="stat-value">${stat.performanceCount}</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Score moyen :</span>
+              <span class="stat-value">${stat.averageScore} ${
+            stat.exercise.unit
+          }</span>
+            </div>
+          </div>
+          
+          <div class="recent-performances">
+            <h5>Performances récentes :</h5>
+            <div class="performance-mini-list">
+              ${stat.recentPerformances
+                .map(
+                  (perf) => `
+                <div class="mini-performance">
+                  <span class="mini-date">${new Date(
+                    perf.date
+                  ).toLocaleDateString("fr-FR")}</span>
+                  <span class="mini-score">${perf.bestScore} ${
+                    stat.exercise.unit
+                  }</span>
+                </div>
+              `
+                )
+                .join("")}
+            </div>
+          </div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>
+  `;
+
+  // Ajouter un graphique global de progression
+  statsHTML += `
+    <div class="chart-container">
+      <h3>📈 Progression globale</h3>
+      <canvas id="globalProgressChart" width="400" height="200"></canvas>
+    </div>
+  `;
+
+  document.getElementById("statsContent").innerHTML = statsHTML;
+
+  // Créer le graphique de progression globale
+  createGlobalProgressChart(playerId);
+}
+
+function createGlobalProgressChart(playerId) {
+  const canvas = document.getElementById("globalProgressChart");
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  const player = players.find((p) => p.id === playerId);
+  const playerPerformances = performances.filter(
+    (p) => p.playerId === playerId
+  );
+
+  if (playerPerformances.length === 0) return;
+
+  // Trier les performances par date
+  const sortedPerformances = playerPerformances.sort(
+    (a, b) => new Date(a.date) - new Date(b.date)
+  );
+
+  // Créer des datasets pour chaque exercice
+  const exerciseDatasets = {};
+  sortedPerformances.forEach((perf) => {
+    const exercise = exercises.find((e) => e.id === perf.exerciseId);
+    if (!exerciseDatasets[exercise.name]) {
+      exerciseDatasets[exercise.name] = {
+        exercise: exercise,
+        data: [],
+        labels: [],
+      };
+    }
+    exerciseDatasets[exercise.name].data.push(perf.bestScore);
+    exerciseDatasets[exercise.name].labels.push(
+      new Date(perf.date).toLocaleDateString("fr-FR")
+    );
+  });
+
+  // Créer les datasets pour Chart.js
+  const colors = [
+    "#4299e1",
+    "#48bb78",
+    "#ed8936",
+    "#f56565",
+    "#9f7aea",
+    "#38b2ac",
+  ];
+  const datasets = Object.keys(exerciseDatasets).map((exerciseName, index) => {
+    const dataset = exerciseDatasets[exerciseName];
+    return {
+      label: exerciseName,
+      data: dataset.data,
+      borderColor: colors[index % colors.length],
+      backgroundColor: colors[index % colors.length] + "20",
+      tension: 0.1,
+      pointRadius: 4,
+      pointHoverRadius: 6,
+    };
+  });
+
+  // Tous les labels uniques (dates)
+  const allLabels = [
+    ...new Set(
+      sortedPerformances.map((p) =>
+        new Date(p.date).toLocaleDateString("fr-FR")
+      )
+    ),
+  ].sort();
+
+  new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: allLabels,
+      datasets: datasets,
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: false,
+          title: {
+            display: true,
+            text: "Scores",
+          },
+        },
+      },
+      plugins: {
+        title: {
+          display: true,
+          text: `Progression globale de ${player.name}`,
+          font: {
+            size: 16,
+          },
+        },
+        legend: {
+          position: "top",
+        },
+      },
+    },
+  });
 }
 
 function calculateExerciseStats(exerciseId) {
@@ -1232,11 +1452,143 @@ function createPerformanceChart(exerciseId, playerId) {
   }
 }
 
-function updatePlayerChart() {
-  const playerId = document.getElementById("statsPlayer").value;
-  const exerciseId = document.getElementById("statsExercise").value;
+// ===== FONCTIONS DE RESET =====
 
-  if (playerId && exerciseId) {
-    updateCurrentPlayerStats(playerId, exerciseId);
+function resetAllData() {
+  if (
+    confirm(
+      "⚠️ Êtes-vous sûr de vouloir recommencer la séance ?\n\nCette action supprimera TOUTES les données :\n- Tous les exercices\n- Toutes les joueuses\n- Toutes les performances\n\nCette action est irréversible !"
+    )
+  ) {
+    exercises = [];
+    players = [];
+    performances = [];
+    saveData();
+    updateInterface();
+
+    // Réinitialiser les formulaires
+    document.getElementById("exerciseName").value = "";
+    document.getElementById("exerciseDescription").value = "";
+    document.getElementById("playerName").value = "";
+
+    // Réinitialiser les sélecteurs
+    document.getElementById("perfExercise").innerHTML =
+      '<option value="">Sélectionnez un exercice</option>';
+    document.getElementById("perfPlayer").innerHTML =
+      '<option value="">Sélectionnez une joueuse</option>';
+    document.getElementById("statsExercise").innerHTML =
+      '<option value="">Sélectionnez un exercice</option>';
+    document.getElementById("statsPlayer").innerHTML =
+      '<option value="">Toutes les joueuses</option>';
+
+    // Masquer les interfaces
+    document.getElementById("performanceInterface").style.display = "none";
+    document.getElementById("currentPlayerStats").style.display = "none";
+    document.getElementById("statsContent").innerHTML = `
+      <div class="no-data">
+        <h3>📊 Sélectionnez un exercice pour voir les statistiques</h3>
+        <p>Les graphiques d'évolution et de comparaison s'afficheront ici</p>
+      </div>
+    `;
+
+    alert("✅ Séance réinitialisée avec succès !");
+  }
+}
+
+function resetExercises() {
+  if (
+    confirm(
+      "⚠️ Êtes-vous sûr de vouloir supprimer TOUS les exercices ?\n\nCette action supprimera également toutes les performances associées.\n\nCette action est irréversible !"
+    )
+  ) {
+    exercises = [];
+    // Supprimer aussi les performances car elles dépendent des exercices
+    performances = performances.filter((p) => false); // Supprime tout
+    saveData();
+    updateInterface();
+
+    // Réinitialiser le formulaire
+    document.getElementById("exerciseName").value = "";
+    document.getElementById("exerciseDescription").value = "";
+    document.querySelector(
+      'input[name="exerciseType"][value="time_fast"]'
+    ).checked = true;
+
+    // Réinitialiser les sélecteurs
+    document.getElementById("perfExercise").innerHTML =
+      '<option value="">Sélectionnez un exercice</option>';
+    document.getElementById("statsExercise").innerHTML =
+      '<option value="">Sélectionnez un exercice</option>';
+
+    // Masquer les interfaces
+    document.getElementById("performanceInterface").style.display = "none";
+    document.getElementById("currentPlayerStats").style.display = "none";
+    document.getElementById("statsContent").innerHTML = `
+      <div class="no-data">
+        <h3>📊 Sélectionnez un exercice pour voir les statistiques</h3>
+        <p>Les graphiques d'évolution et de comparaison s'afficheront ici</p>
+      </div>
+    `;
+
+    alert("✅ Exercices supprimés avec succès !");
+  }
+}
+
+function resetPlayers() {
+  if (
+    confirm(
+      "⚠️ Êtes-vous sûr de vouloir supprimer TOUTES les joueuses ?\n\nCette action supprimera également toutes les performances associées.\n\nCette action est irréversible !"
+    )
+  ) {
+    players = [];
+    // Supprimer aussi les performances car elles dépendent des joueuses
+    performances = performances.filter((p) => false); // Supprime tout
+    saveData();
+    updateInterface();
+
+    // Réinitialiser le formulaire
+    document.getElementById("playerName").value = "";
+
+    // Réinitialiser les sélecteurs
+    document.getElementById("perfPlayer").innerHTML =
+      '<option value="">Sélectionnez une joueuse</option>';
+    document.getElementById("statsPlayer").innerHTML =
+      '<option value="">Toutes les joueuses</option>';
+
+    // Masquer les interfaces
+    document.getElementById("performanceInterface").style.display = "none";
+    document.getElementById("currentPlayerStats").style.display = "none";
+    document.getElementById("statsContent").innerHTML = `
+      <div class="no-data">
+        <h3>📊 Sélectionnez un exercice pour voir les statistiques</h3>
+        <p>Les graphiques d'évolution et de comparaison s'afficheront ici</p>
+      </div>
+    `;
+
+    alert("✅ Joueuses supprimées avec succès !");
+  }
+}
+
+function resetPerformances() {
+  if (
+    confirm(
+      "⚠️ Êtes-vous sûr de vouloir supprimer TOUTES les performances ?\n\nCette action est irréversible !"
+    )
+  ) {
+    performances = [];
+    saveData();
+    updateInterface();
+
+    // Masquer les interfaces
+    document.getElementById("performanceInterface").style.display = "none";
+    document.getElementById("currentPlayerStats").style.display = "none";
+    document.getElementById("statsContent").innerHTML = `
+      <div class="no-data">
+        <h3>📊 Sélectionnez un exercice pour voir les statistiques</h3>
+        <p>Les graphiques d'évolution et de comparaison s'afficheront ici</p>
+      </div>
+    `;
+
+    alert("✅ Performances supprimées avec succès !");
   }
 }
