@@ -220,10 +220,37 @@
             <h3 id="performanceTitle">Nouvelle session</h3>
             <p id="performanceDescription"></p>
 
+            <div class="series-config">
+              <div class="form-group">
+                <label for="seriesCount">Nombre de séries :</label>
+                <input
+                  type="number"
+                  id="seriesCount"
+                  min="1"
+                  max="10"
+                  value="1"
+                  onchange="updateAttemptsGrid()"
+                />
+              </div>
+              <div class="form-group">
+                <label for="repetitionsCount"
+                  >Nombre de répétitions par série :</label
+                >
+                <input
+                  type="number"
+                  id="repetitionsCount"
+                  min="1"
+                  max="10"
+                  value="5"
+                  onchange="updateAttemptsGrid()"
+                />
+              </div>
+            </div>
+
             <div id="attemptsSection">
-              <label>Saisir les tentatives :</label>
-              <div class="attempts-grid" id="attemptsGrid">
-                <!-- Les champs de tentatives seront générés ici -->
+              <label>Saisir les performances :</label>
+              <div id="seriesContainer">
+                <!-- Les séries seront générées ici -->
               </div>
               <div class="action-buttons">
                 <button class="btn" onclick="savePerformance()">
