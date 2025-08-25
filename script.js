@@ -1,19 +1,13 @@
-// Variables globales pour stocker les données
-let exercises = JSON.parse(localStorage.getItem("exercises")) || [];
 let players = JSON.parse(localStorage.getItem("players")) || [];
 let performances = JSON.parse(localStorage.getItem("performances")) || [];
 
-// Variables pour l'import Excel
 let importData = null;
 let conflicts = [];
 
-// Initialisation
 document.addEventListener("DOMContentLoaded", function () {
   loadData();
   updateInterface();
 });
-
-// ===== FONCTIONS DE BASE =====
 
 function saveData() {
   localStorage.setItem("exercises", JSON.stringify(exercises));
@@ -34,23 +28,16 @@ function updateInterface() {
   updatePlayerSelectors();
 }
 
-// ===== GESTION DES ONGLETS =====
-
 function showTab(tabName) {
-  // Masquer tous les onglets
   const tabContents = document.querySelectorAll(".tab-content");
   tabContents.forEach((content) => content.classList.remove("active"));
 
-  // Désactiver tous les onglets
   const tabs = document.querySelectorAll(".tab");
   tabs.forEach((tab) => tab.classList.remove("active"));
 
-  // Activer l'onglet sélectionné
   document.getElementById(tabName).classList.add("active");
   event.target.classList.add("active");
 }
-
-// ===== GESTION DES EXERCICES =====
 
 function addExercise() {
   const name = document.getElementById("exerciseName").value.trim();
@@ -80,7 +67,6 @@ function addExercise() {
   saveData();
   updateInterface();
 
-  // Reset form
   document.getElementById("exerciseName").value = "";
   document.getElementById("exerciseDescription").value = "";
   document.querySelector(
@@ -139,8 +125,6 @@ function deleteExercise(id) {
   );
 }
 
-// ===== GESTION DES JOUEUSES =====
-
 function addPlayer() {
   const name = document.getElementById("playerName").value.trim();
 
@@ -159,7 +143,6 @@ function addPlayer() {
   saveData();
   updateInterface();
 
-  // Reset form
   document.getElementById("playerName").value = "";
 }
 
@@ -203,8 +186,6 @@ function deletePlayer(id) {
     }
   );
 }
-
-// ===== GESTION DES PERFORMANCES =====
 
 function updateExerciseSelectors() {
   const selectors = ["perfExercise", "statsExercise"];
@@ -252,7 +233,6 @@ function updatePerformanceInterface() {
     document.getElementById("performanceDescription").textContent =
       exercise.description || "";
 
-    // Générer les séries
     updateAttemptsGrid();
 
     document.getElementById("performanceInterface").style.display = "block";
@@ -367,7 +347,6 @@ function savePerformance() {
   const allAttempts = [];
   const seriesData = [];
 
-  // Collecter toutes les données des séries
   for (let series = 1; series <= seriesCount; series++) {
     const seriesValues = [];
     for (let rep = 1; rep <= repetitionsCount; rep++) {
@@ -398,7 +377,6 @@ function savePerformance() {
   const exercise = exercises.find((e) => e.id === exerciseId);
   let bestScore;
 
-  // Déterminer le meilleur score selon le type d'exercice
   if (
     exercise.type.includes("time") ||
     exercise.type.includes("distance_short")
@@ -424,7 +402,6 @@ function savePerformance() {
   saveData();
   updateInterface();
 
-  // Reset form
   resetPerformanceForm();
 
   showSuccessModal("✅ Succès", "Performance enregistrée avec succès !", "✅");
@@ -445,7 +422,6 @@ function resetPerformanceForm() {
     }
   }
 
-  // Mettre à jour les résumés des séries
   updateSeriesSummary();
 }
 
@@ -501,13 +477,10 @@ function updateCurrentPlayerStats(playerId, exerciseId) {
   playerStats.style.display = "block";
 }
 
-// ===== FONCTIONS D'EXPORT/IMPORT EXCEL =====
-
 function exportToExcel() {
   try {
     const workbook = XLSX.utils.book_new();
 
-    // Feuille Exercices
     const exercisesData = exercises.map((ex) => ({
       ID: ex.id,
       Nom: ex.name,
@@ -519,7 +492,6 @@ function exportToExcel() {
     const exercisesSheet = XLSX.utils.json_to_sheet(exercisesData);
     XLSX.utils.book_append_sheet(workbook, exercisesSheet, "Exercices");
 
-    // Feuille Joueuses
     const playersData = players.map((player) => {
       const performanceCount = performances.filter(
         (p) => p.playerId === player.id
@@ -536,7 +508,6 @@ function exportToExcel() {
     const playersSheet = XLSX.utils.json_to_sheet(playersData);
     XLSX.utils.book_append_sheet(workbook, playersSheet, "Joueuses");
 
-    // Feuille Performances
     const performancesData = performances.map((perf) => {
       const player = players.find((p) => p.id === perf.playerId);
       const exercise = exercises.find((e) => e.id === perf.exerciseId);
@@ -556,7 +527,6 @@ function exportToExcel() {
     const performancesSheet = XLSX.utils.json_to_sheet(performancesData);
     XLSX.utils.book_append_sheet(workbook, performancesSheet, "Performances");
 
-    // Feuille Résumé
     const summaryData = [];
     players.forEach((player) => {
       exercises.forEach((exercise) => {
@@ -592,11 +562,9 @@ function exportToExcel() {
     const summarySheet = XLSX.utils.json_to_sheet(summaryData);
     XLSX.utils.book_append_sheet(workbook, summarySheet, "Résumé");
 
-    // Générer le nom du fichier avec la date
     const today = new Date().toISOString().split("T")[0];
     const fileName = `performances-${today}.xlsx`;
 
-    // Télécharger le fichier
     XLSX.writeFile(workbook, fileName);
 
     showSuccessModal(
@@ -638,7 +606,6 @@ function previewExcelFile() {
       const data = new Uint8Array(e.target.result);
       const workbook = XLSX.read(data, { type: "array" });
 
-      // Vérifier la structure du fichier
       const requiredSheets = ["Exercices", "Joueuses", "Performances"];
       const missingSheets = requiredSheets.filter(
         (sheet) => !workbook.SheetNames.includes(sheet)
@@ -653,17 +620,14 @@ function previewExcelFile() {
         return;
       }
 
-      // Lire les données
       importData = {
         exercises: XLSX.utils.sheet_to_json(workbook.Sheets["Exercices"]),
         players: XLSX.utils.sheet_to_json(workbook.Sheets["Joueuses"]),
         performances: XLSX.utils.sheet_to_json(workbook.Sheets["Performances"]),
       };
 
-      // Analyser les conflits
       conflicts = analyzeConflicts(importData);
 
-      // Afficher l'aperçu
       displayImportPreview(importData, conflicts);
     } catch (error) {
       console.error("Erreur lors de la lecture du fichier:", error);
@@ -680,7 +644,6 @@ function previewExcelFile() {
 function analyzeConflicts(importData) {
   const conflicts = [];
 
-  // Analyser les exercices
   importData.exercises.forEach((importedEx) => {
     const existingEx = exercises.find((ex) => ex.name === importedEx.Nom);
     if (existingEx) {
@@ -692,7 +655,6 @@ function analyzeConflicts(importData) {
     }
   });
 
-  // Analyser les joueuses
   importData.players.forEach((importedPlayer) => {
     const existingPlayer = players.find((p) => p.name === importedPlayer.Nom);
     if (existingPlayer) {
@@ -712,7 +674,6 @@ function displayImportPreview(importData, conflicts) {
   const conflictsSection = document.getElementById("conflictsSection");
   const conflictsList = document.getElementById("conflictsList");
 
-  // Afficher le résumé
   let previewHTML = `
         <div class="summary-section">
             <h4>📊 Résumé de l'import</h4>
@@ -733,7 +694,6 @@ function displayImportPreview(importData, conflicts) {
         </div>
     `;
 
-  // Afficher un aperçu des données
   previewHTML += `
         <h4>Exercices à importer :</h4>
         <table class="preview-table">
@@ -786,7 +746,6 @@ function displayImportPreview(importData, conflicts) {
 
   previewContent.innerHTML = previewHTML;
 
-  // Afficher les conflits s'il y en a
   if (conflicts.length > 0) {
     conflictsList.innerHTML = conflicts
       .map(
@@ -815,7 +774,6 @@ function confirmImport() {
   }
 
   try {
-    // Importer les exercices
     importData.exercises.forEach((importedEx) => {
       const existingEx = exercises.find((ex) => ex.name === importedEx.Nom);
       if (!existingEx) {
@@ -830,7 +788,6 @@ function confirmImport() {
       }
     });
 
-    // Importer les joueuses
     importData.players.forEach((importedPlayer) => {
       const existingPlayer = players.find((p) => p.name === importedPlayer.Nom);
       if (!existingPlayer) {
@@ -842,7 +799,6 @@ function confirmImport() {
       }
     });
 
-    // Importer les performances
     importData.performances.forEach((importedPerf) => {
       const player = players.find((p) => p.name === importedPerf.Joueuse);
       const exercise = exercises.find((e) => e.name === importedPerf.Exercice);
@@ -859,7 +815,7 @@ function confirmImport() {
         if (attempts.length > 0) {
           performances.push({
             id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-            date: new Date().toISOString(), // On utilise la date actuelle
+            date: new Date().toISOString(),
             playerId: player.id,
             exerciseId: exercise.id,
             attempts: attempts,
@@ -898,8 +854,6 @@ function getExerciseTypeFromLabel(label) {
   return typeMap[label] || "time_fast";
 }
 
-// ===== FONCTION FIN D'ENTRAÎNEMENT =====
-
 function finishTraining() {
   showConfirmModal(
     "🏁 Fin d'entraînement",
@@ -917,13 +871,10 @@ function finishTraining() {
   );
 }
 
-// ===== GESTION DES STATISTIQUES =====
-
 function updateStatsInterface() {
   const exerciseId = document.getElementById("statsExercise").value;
   const playerId = document.getElementById("statsPlayer").value;
 
-  // Si aucune joueuse et aucun exercice sélectionnés
   if (!exerciseId && !playerId) {
     document.getElementById("statsContent").innerHTML = `
             <div class="no-data">
@@ -934,7 +885,6 @@ function updateStatsInterface() {
     return;
   }
 
-  // Si seule une joueuse est sélectionnée (sans exercice)
   if (!exerciseId && playerId) {
     displayPlayerAllExercisesStats(playerId);
     return;
@@ -955,7 +905,6 @@ function updateStatsInterface() {
     return;
   }
 
-  // Calculer les statistiques
   const stats = calculateExerciseStats(exerciseId);
 
   let statsHTML = `
@@ -979,9 +928,7 @@ function updateStatsInterface() {
         </div>
     `;
 
-  // Afficher les meilleurs scores par joueuse
   if (playerId) {
-    // Une joueuse spécifique sélectionnée
     const player = players.find((p) => p.id === playerId);
     const playerPerformances = exercisePerformances.filter(
       (p) => p.playerId === playerId
@@ -1041,7 +988,6 @@ function updateStatsInterface() {
             `;
     }
   } else {
-    // Toutes les joueuses - afficher uniquement le classement
     const playerStats = calculatePlayerStatsForExercise(exerciseId);
 
     statsHTML += `
@@ -1088,7 +1034,6 @@ function updateStatsInterface() {
         `;
   }
 
-  // Ajouter le graphique uniquement si une joueuse est sélectionnée
   if (playerId) {
     statsHTML += `
         <div class="chart-container">
@@ -1100,7 +1045,6 @@ function updateStatsInterface() {
 
   document.getElementById("statsContent").innerHTML = statsHTML;
 
-  // Créer le graphique uniquement si une joueuse est sélectionnée
   if (playerId) {
     createPerformanceChart(exerciseId, playerId);
   }
@@ -1122,7 +1066,6 @@ function displayPlayerAllExercisesStats(playerId) {
     return;
   }
 
-  // Calculer les statistiques globales de la joueuse
   const totalPerformances = playerPerformances.length;
   const uniqueExercises = new Set(playerPerformances.map((p) => p.exerciseId))
     .size;
@@ -1149,7 +1092,6 @@ function displayPlayerAllExercisesStats(playerId) {
     </div>
   `;
 
-  // Grouper les performances par exercice
   const performancesByExercise = {};
   playerPerformances.forEach((perf) => {
     if (!performancesByExercise[perf.exerciseId]) {
@@ -1158,13 +1100,11 @@ function displayPlayerAllExercisesStats(playerId) {
     performancesByExercise[perf.exerciseId].push(perf);
   });
 
-  // Créer les statistiques par exercice
   const exerciseStats = [];
   Object.keys(performancesByExercise).forEach((exerciseId) => {
     const exercise = exercises.find((e) => e.id === exerciseId);
     const exercisePerformances = performancesByExercise[exerciseId];
 
-    // Trouver le meilleur score
     const bestPerformance = exercisePerformances.reduce((best, current) => {
       if (
         exercise.type.includes("time") ||
@@ -1176,7 +1116,6 @@ function displayPlayerAllExercisesStats(playerId) {
       }
     });
 
-    // Calculer la moyenne
     const scores = exercisePerformances.map((p) => p.bestScore);
     const exerciseAverage = (
       scores.reduce((a, b) => a + b, 0) / scores.length
@@ -1194,10 +1133,8 @@ function displayPlayerAllExercisesStats(playerId) {
     });
   });
 
-  // Trier par nombre de performances (plus pratiqués en premier)
   exerciseStats.sort((a, b) => b.performanceCount - a.performanceCount);
 
-  // Afficher les statistiques par exercice
   statsHTML += `
     <div class="performance-section">
       <h3>🏆 Records par exercice</h3>
@@ -1257,7 +1194,6 @@ function displayPlayerAllExercisesStats(playerId) {
             </div>
         `;
 
-  // Ajouter un graphique global de progression
   statsHTML += `
         <div class="chart-container">
       <h3>📈 Progression globale</h3>
@@ -1267,7 +1203,6 @@ function displayPlayerAllExercisesStats(playerId) {
 
   document.getElementById("statsContent").innerHTML = statsHTML;
 
-  // Créer le graphique de progression globale
   createGlobalProgressChart(playerId);
 }
 
@@ -1283,12 +1218,10 @@ function createGlobalProgressChart(playerId) {
 
   if (playerPerformances.length === 0) return;
 
-  // Trier les performances par date
   const sortedPerformances = playerPerformances.sort(
     (a, b) => new Date(a.date) - new Date(b.date)
   );
 
-  // Créer des datasets pour chaque exercice
   const exerciseDatasets = {};
   sortedPerformances.forEach((perf) => {
     const exercise = exercises.find((e) => e.id === perf.exerciseId);
@@ -1305,7 +1238,6 @@ function createGlobalProgressChart(playerId) {
     );
   });
 
-  // Créer les datasets pour Chart.js
   const colors = [
     "#4299e1",
     "#48bb78",
@@ -1327,7 +1259,6 @@ function createGlobalProgressChart(playerId) {
     };
   });
 
-  // Tous les labels uniques (dates)
   const allLabels = [
     ...new Set(
       sortedPerformances.map((p) =>
@@ -1405,7 +1336,6 @@ function calculatePlayerStatsForExercise(exerciseId) {
     (p) => p.exerciseId === exerciseId
   );
 
-  // Grouper par joueuse
   const playerStats = [];
 
   players.forEach((player) => {
@@ -1414,7 +1344,6 @@ function calculatePlayerStatsForExercise(exerciseId) {
     );
 
     if (playerPerformances.length > 0) {
-      // Trouver le meilleur score
       const bestPerformance = playerPerformances.reduce((best, current) => {
         if (
           exercise.type.includes("time") ||
@@ -1426,13 +1355,11 @@ function calculatePlayerStatsForExercise(exerciseId) {
         }
       });
 
-      // Calculer la moyenne
       const scores = playerPerformances.map((p) => p.bestScore);
       const averageScore = (
         scores.reduce((a, b) => a + b, 0) / scores.length
       ).toFixed(2);
 
-      // Performances récentes (5 dernières)
       const recentPerformances = playerPerformances
         .sort((a, b) => new Date(b.date) - new Date(a.date))
         .slice(0, 5);
@@ -1448,7 +1375,6 @@ function calculatePlayerStatsForExercise(exerciseId) {
     }
   });
 
-  // Trier par meilleur score
   if (
     exercise.type.includes("time") ||
     exercise.type.includes("distance_short")
@@ -1471,7 +1397,6 @@ function createPerformanceChart(exerciseId, playerId) {
     (p) => p.exerciseId === exerciseId
   );
 
-  // Si une joueuse spécifique est sélectionnée, filtrer ses performances
   if (playerId) {
     exercisePerformances = exercisePerformances.filter(
       (p) => p.playerId === playerId
@@ -1479,7 +1404,6 @@ function createPerformanceChart(exerciseId, playerId) {
     const player = players.find((p) => p.id === playerId);
 
     if (exercisePerformances.length === 0) {
-      // Pas de données pour cette joueuse
       ctx.font = "16px Arial";
       ctx.fillStyle = "#718096";
       ctx.textAlign = "center";
@@ -1492,7 +1416,6 @@ function createPerformanceChart(exerciseId, playerId) {
     }
   }
 
-  // Grouper par date
   const performancesByDate = {};
   exercisePerformances.forEach((perf) => {
     const date = new Date(perf.date).toLocaleDateString("fr-FR");
@@ -1507,7 +1430,6 @@ function createPerformanceChart(exerciseId, playerId) {
   );
 
   if (playerId) {
-    // Une joueuse spécifique - afficher toutes ses performances
     const player = players.find((p) => p.id === playerId);
     const datasets = [
       {
@@ -1556,7 +1478,6 @@ function createPerformanceChart(exerciseId, playerId) {
       },
     });
   } else {
-    // Toutes les joueuses - afficher les meilleurs scores par date
     const data = labels.map((date) => {
       const scores = performancesByDate[date];
       if (
@@ -1610,8 +1531,6 @@ function createPerformanceChart(exerciseId, playerId) {
   }
 }
 
-// ===== FONCTIONS DE RESET =====
-
 function resetAllData() {
   showConfirmModal(
     "🔄 Recommencer la séance",
@@ -1625,12 +1544,10 @@ function resetAllData() {
       saveData();
       updateInterface();
 
-      // Réinitialiser les formulaires
       document.getElementById("exerciseName").value = "";
       document.getElementById("exerciseDescription").value = "";
       document.getElementById("playerName").value = "";
 
-      // Réinitialiser les sélecteurs
       document.getElementById("perfExercise").innerHTML =
         '<option value="">Sélectionnez un exercice</option>';
       document.getElementById("perfPlayer").innerHTML =
@@ -1640,7 +1557,6 @@ function resetAllData() {
       document.getElementById("statsPlayer").innerHTML =
         '<option value="">Toutes les joueuses</option>';
 
-      // Masquer les interfaces
       document.getElementById("performanceInterface").style.display = "none";
       document.getElementById("currentPlayerStats").style.display = "none";
       document.getElementById("statsContent").innerHTML = `
@@ -1663,25 +1579,21 @@ function resetExercises() {
     "reset",
     function () {
       exercises = [];
-      // Supprimer aussi les performances car elles dépendent des exercices
-      performances = performances.filter((p) => false); // Supprime tout
+      performances = performances.filter((p) => false);
       saveData();
       updateInterface();
 
-      // Réinitialiser le formulaire
       document.getElementById("exerciseName").value = "";
       document.getElementById("exerciseDescription").value = "";
       document.querySelector(
         'input[name="exerciseType"][value="time_fast"]'
       ).checked = true;
 
-      // Réinitialiser les sélecteurs
       document.getElementById("perfExercise").innerHTML =
         '<option value="">Sélectionnez un exercice</option>';
       document.getElementById("statsExercise").innerHTML =
         '<option value="">Sélectionnez un exercice</option>';
 
-      // Masquer les interfaces
       document.getElementById("performanceInterface").style.display = "none";
       document.getElementById("currentPlayerStats").style.display = "none";
       document.getElementById("statsContent").innerHTML = `
@@ -1704,21 +1616,17 @@ function resetPlayers() {
     "reset",
     function () {
       players = [];
-      // Supprimer aussi les performances car elles dépendent des joueuses
-      performances = performances.filter((p) => false); // Supprime tout
+      performances = performances.filter((p) => false);
       saveData();
       updateInterface();
 
-      // Réinitialiser le formulaire
       document.getElementById("playerName").value = "";
 
-      // Réinitialiser les sélecteurs
       document.getElementById("perfPlayer").innerHTML =
         '<option value="">Sélectionnez une joueuse</option>';
       document.getElementById("statsPlayer").innerHTML =
         '<option value="">Toutes les joueuses</option>';
 
-      // Masquer les interfaces
       document.getElementById("performanceInterface").style.display = "none";
       document.getElementById("currentPlayerStats").style.display = "none";
       document.getElementById("statsContent").innerHTML = `
@@ -1744,7 +1652,6 @@ function resetPerformances() {
       saveData();
       updateInterface();
 
-      // Masquer les interfaces
       document.getElementById("performanceInterface").style.display = "none";
       document.getElementById("currentPlayerStats").style.display = "none";
       document.getElementById("statsContent").innerHTML = `
@@ -1763,13 +1670,9 @@ function resetPerformances() {
   );
 }
 
-// ===== FONCTIONS POUR LES MODALS =====
-
-// Variables globales pour les modals
 let confirmCallback = null;
 let confirmAction = null;
 
-// Fonction pour afficher un modal de confirmation
 function showConfirmModal(title, message, icon, action, callback) {
   document.getElementById("confirmTitle").textContent = title;
   document.getElementById("confirmMessage").textContent = message;
@@ -1779,14 +1682,12 @@ function showConfirmModal(title, message, icon, action, callback) {
   document.getElementById("confirmModal").style.display = "block";
 }
 
-// Fonction pour fermer le modal de confirmation
 function closeConfirmModal() {
   document.getElementById("confirmModal").style.display = "none";
   confirmCallback = null;
   confirmAction = null;
 }
 
-// Fonction pour exécuter l'action confirmée
 function executeConfirmAction() {
   if (confirmCallback) {
     confirmCallback();
@@ -1794,7 +1695,6 @@ function executeConfirmAction() {
   closeConfirmModal();
 }
 
-// Fonction pour afficher un modal de succès
 function showSuccessModal(title, message, icon = "✅") {
   document.getElementById("successTitle").textContent = title;
   document.getElementById("successMessage").textContent = message;
@@ -1802,12 +1702,10 @@ function showSuccessModal(title, message, icon = "✅") {
   document.getElementById("successModal").style.display = "block";
 }
 
-// Fonction pour fermer le modal de succès
 function closeSuccessModal() {
   document.getElementById("successModal").style.display = "none";
 }
 
-// Fonction pour afficher un modal d'erreur
 function showErrorModal(title, message, icon = "❌") {
   document.getElementById("errorTitle").textContent = title;
   document.getElementById("errorMessage").textContent = message;
@@ -1815,12 +1713,10 @@ function showErrorModal(title, message, icon = "❌") {
   document.getElementById("errorModal").style.display = "block";
 }
 
-// Fonction pour fermer le modal d'erreur
 function closeErrorModal() {
   document.getElementById("errorModal").style.display = "none";
 }
 
-// Fermer les modals en cliquant à l'extérieur
 window.onclick = function (event) {
   const modals = document.querySelectorAll(".modal");
   modals.forEach((modal) => {
