@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Suivi des Performances - Collectif Sportif Féminin</title>
+    <title>Suivi des Performances Sportives</title>
     <link rel="stylesheet" href="styles.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -28,7 +28,6 @@
         </div>
       </div>
 
-      <!-- Modal pour l'import Excel -->
       <div id="importModal" class="modal" style="display: none">
         <div class="modal-content">
           <div class="modal-header">
@@ -78,7 +77,6 @@
         </div>
       </div>
 
-      <!-- Modal de confirmation générique -->
       <div id="confirmModal" class="modal" style="display: none">
         <div class="modal-content confirm-modal">
           <div class="modal-header">
@@ -106,7 +104,6 @@
         </div>
       </div>
 
-      <!-- Modal de succès -->
       <div id="successModal" class="modal" style="display: none">
         <div class="modal-content success-modal">
           <div class="modal-header">
@@ -125,7 +122,6 @@
         </div>
       </div>
 
-      <!-- Modal d'erreur -->
       <div id="errorModal" class="modal" style="display: none">
         <div class="modal-content error-modal">
           <div class="modal-header">
@@ -155,7 +151,6 @@
         <button class="tab" onclick="showTab('stats')">Statistiques</button>
       </div>
 
-      <!-- Onglet Gestion des Exercices -->
       <div id="exercises" class="tab-content active">
         <h2>Gestion des Types d'Exercices</h2>
 
@@ -233,12 +228,9 @@
           </button>
         </div>
 
-        <div id="exercisesList" class="exercise-list">
-          <!-- Les exercices seront affichés ici -->
-        </div>
+        <div id="exercisesList" class="exercise-list"></div>
       </div>
 
-      <!-- Onglet Gestion des Joueuses -->
       <div id="players" class="tab-content">
         <h2>Gestion des Joueuses</h2>
 
@@ -257,12 +249,9 @@
           </button>
         </div>
 
-        <div id="playersList" class="player-list">
-          <!-- Les joueuses seront affichées ici -->
-        </div>
+        <div id="playersList" class="player-list"></div>
       </div>
 
-      <!-- Onglet Enregistrement des Performances -->
       <div id="performances" class="tab-content">
         <h2>Enregistrer des Performances</h2>
 
@@ -315,9 +304,7 @@
 
             <div id="attemptsSection">
               <label>Saisir les performances :</label>
-              <div id="seriesContainer">
-                <!-- Les séries seront générées ici -->
-              </div>
+              <div id="seriesContainer"></div>
               <div class="action-buttons">
                 <button class="btn" onclick="savePerformance()">
                   Enregistrer la performance
@@ -334,12 +321,9 @@
           id="currentPlayerStats"
           class="performance-section"
           style="display: none"
-        >
-          <!-- Statistiques de la joueuse sélectionnée -->
-        </div>
+        ></div>
       </div>
 
-      <!-- Onglet Statistiques -->
       <div id="stats" class="tab-content">
         <h2>Statistiques et Analyses</h2>
 
