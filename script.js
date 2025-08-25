@@ -170,10 +170,10 @@ function updatePlayersList() {
     card.innerHTML = `
             <div class="player-name">${player.name}</div>
             <div class="exercise-details">
-                <strong>Inscrite le:</strong> ${new Date(
+                <strong>Date de la séance :</strong> ${new Date(
                   player.registeredAt
                 ).toLocaleDateString("fr-FR")}<br>
-                <strong>Performances:</strong> ${performanceCount}
+                <strong>Performances :</strong> ${performanceCount}
             </div>
             <button class="btn btn-danger" onclick="deletePlayer('${
               player.id
@@ -240,24 +240,98 @@ function updatePerformanceInterface() {
     document.getElementById("performanceDescription").textContent =
       exercise.description || "";
 
-    // Générer les champs de tentatives
-    const attemptsGrid = document.getElementById("attemptsGrid");
-    attemptsGrid.innerHTML = "";
-    for (let i = 1; i <= 5; i++) {
-      const input = document.createElement("input");
-      input.type = "number";
-      input.step = "0.01";
-      input.className = "attempt-input";
-      input.placeholder = `Tentative ${i}`;
-      input.id = `attempt${i}`;
-      attemptsGrid.appendChild(input);
-    }
+    // Générer les séries
+    updateAttemptsGrid();
 
     document.getElementById("performanceInterface").style.display = "block";
     updateCurrentPlayerStats(playerId, exerciseId);
   } else {
     document.getElementById("performanceInterface").style.display = "none";
     document.getElementById("currentPlayerStats").style.display = "none";
+  }
+}
+
+function updateAttemptsGrid() {
+  const seriesCount =
+    parseInt(document.getElementById("seriesCount").value) || 1;
+  const repetitionsCount =
+    parseInt(document.getElementById("repetitionsCount").value) || 5;
+  const container = document.getElementById("seriesContainer");
+
+  container.innerHTML = "";
+
+  for (let series = 1; series <= seriesCount; series++) {
+    const seriesDiv = document.createElement("div");
+    seriesDiv.className = "series-container";
+
+    const seriesHeader = document.createElement("h4");
+    seriesHeader.className = "series-header";
+    seriesHeader.textContent = `Série ${series}`;
+
+    const seriesGrid = document.createElement("div");
+    seriesGrid.className = "series-grid";
+
+    for (let rep = 1; rep <= repetitionsCount; rep++) {
+      const input = document.createElement("input");
+      input.type = "number";
+      input.step = "0.01";
+      input.placeholder = `Rép. ${rep}`;
+      input.id = `series${series}_rep${rep}`;
+      input.onchange = updateSeriesSummary;
+      seriesGrid.appendChild(input);
+    }
+
+    const seriesSummary = document.createElement("div");
+    seriesSummary.className = "series-summary";
+    seriesSummary.id = `series${series}_summary`;
+    seriesSummary.innerHTML =
+      "Meilleur score de la série : <span class='best-score'>-</span>";
+
+    seriesDiv.appendChild(seriesHeader);
+    seriesDiv.appendChild(seriesGrid);
+    seriesDiv.appendChild(seriesSummary);
+    container.appendChild(seriesDiv);
+  }
+}
+
+function updateSeriesSummary() {
+  const seriesCount =
+    parseInt(document.getElementById("seriesCount").value) || 1;
+  const exerciseId = document.getElementById("perfExercise").value;
+
+  if (!exerciseId) return;
+
+  const exercise = exercises.find((e) => e.id === exerciseId);
+
+  for (let series = 1; series <= seriesCount; series++) {
+    const repetitionsCount =
+      parseInt(document.getElementById("repetitionsCount").value) || 5;
+    const seriesValues = [];
+
+    for (let rep = 1; rep <= repetitionsCount; rep++) {
+      const input = document.getElementById(`series${series}_rep${rep}`);
+      if (input && input.value) {
+        seriesValues.push(parseFloat(input.value));
+      }
+    }
+
+    const summaryElement = document.getElementById(`series${series}_summary`);
+    if (summaryElement && seriesValues.length > 0) {
+      let bestScore;
+      if (
+        exercise.type.includes("time") ||
+        exercise.type.includes("distance_short")
+      ) {
+        bestScore = Math.min(...seriesValues);
+      } else {
+        bestScore = Math.max(...seriesValues);
+      }
+
+      summaryElement.innerHTML = `Meilleur score de la série : <span class='best-score'>${bestScore} ${exercise.unit}</span>`;
+    } else if (summaryElement) {
+      summaryElement.innerHTML =
+        "Meilleur score de la série : <span class='best-score'>-</span>";
+    }
   }
 }
 
@@ -270,16 +344,34 @@ function savePerformance() {
     return;
   }
 
-  const attempts = [];
-  for (let i = 1; i <= 5; i++) {
-    const value = document.getElementById(`attempt${i}`).value;
-    if (value) {
-      attempts.push(parseFloat(value));
+  const seriesCount =
+    parseInt(document.getElementById("seriesCount").value) || 1;
+  const repetitionsCount =
+    parseInt(document.getElementById("repetitionsCount").value) || 5;
+  const allAttempts = [];
+  const seriesData = [];
+
+  // Collecter toutes les données des séries
+  for (let series = 1; series <= seriesCount; series++) {
+    const seriesValues = [];
+    for (let rep = 1; rep <= repetitionsCount; rep++) {
+      const input = document.getElementById(`series${series}_rep${rep}`);
+      if (input && input.value) {
+        const value = parseFloat(input.value);
+        seriesValues.push(value);
+        allAttempts.push(value);
+      }
+    }
+    if (seriesValues.length > 0) {
+      seriesData.push({
+        seriesNumber: series,
+        values: seriesValues,
+      });
     }
   }
 
-  if (attempts.length === 0) {
-    alert("Veuillez saisir au moins une tentative");
+  if (allAttempts.length === 0) {
+    alert("Veuillez saisir au moins une performance");
     return;
   }
 
@@ -291,9 +383,9 @@ function savePerformance() {
     exercise.type.includes("time") ||
     exercise.type.includes("distance_short")
   ) {
-    bestScore = Math.min(...attempts);
+    bestScore = Math.min(...allAttempts);
   } else {
-    bestScore = Math.max(...attempts);
+    bestScore = Math.max(...allAttempts);
   }
 
   const performance = {
@@ -301,8 +393,11 @@ function savePerformance() {
     date: new Date().toISOString(),
     playerId: playerId,
     exerciseId: exerciseId,
-    attempts: attempts,
+    attempts: allAttempts,
     bestScore: bestScore,
+    seriesData: seriesData,
+    seriesCount: seriesCount,
+    repetitionsCount: repetitionsCount,
   };
 
   performances.push(performance);
@@ -310,11 +405,28 @@ function savePerformance() {
   updateInterface();
 
   // Reset form
-  for (let i = 1; i <= 5; i++) {
-    document.getElementById(`attempt${i}`).value = "";
-  }
+  resetPerformanceForm();
 
   alert("Performance enregistrée avec succès !");
+}
+
+function resetPerformanceForm() {
+  const seriesCount =
+    parseInt(document.getElementById("seriesCount").value) || 1;
+  const repetitionsCount =
+    parseInt(document.getElementById("repetitionsCount").value) || 5;
+
+  for (let series = 1; series <= seriesCount; series++) {
+    for (let rep = 1; rep <= repetitionsCount; rep++) {
+      const input = document.getElementById(`series${series}_rep${rep}`);
+      if (input) {
+        input.value = "";
+      }
+    }
+  }
+
+  // Mettre à jour les résumés des séries
+  updateSeriesSummary();
 }
 
 function updateCurrentPlayerStats(playerId, exerciseId) {
@@ -395,7 +507,7 @@ function exportToExcel() {
       return {
         ID: player.id,
         Nom: player.name,
-        "Date inscription": new Date(player.registeredAt).toLocaleDateString(
+        "Date de la séance": new Date(player.registeredAt).toLocaleDateString(
           "fr-FR"
         ),
         "Nombre de performances": performanceCount,
@@ -985,7 +1097,7 @@ function displayPlayerAllExercisesStats(playerId) {
           <div class="stat-value">${new Date(
             player.registeredAt
           ).toLocaleDateString("fr-FR")}</div>
-          <div class="stat-label">Inscrite le</div>
+          <div class="stat-label">Date de la séance</div>
         </div>
       </div>
     </div>
@@ -1046,66 +1158,66 @@ function displayPlayerAllExercisesStats(playerId) {
       ${exerciseStats
         .map(
           (stat) => `
-        <div class="player-stat-card">
+                    <div class="player-stat-card">
           <h4>${stat.exercise.name}</h4>
-          <div class="player-stat-details">
-            <div class="stat-row">
+                        <div class="player-stat-details">
+                            <div class="stat-row">
               <span class="stat-label">Record personnel :</span>
-              <span class="stat-value">${stat.bestScore} ${
+                                <span class="stat-value">${stat.bestScore} ${
             stat.exercise.unit
           }</span>
-            </div>
-            <div class="stat-row">
-              <span class="stat-label">Date du record :</span>
-              <span class="stat-value">${new Date(
-                stat.bestDate
-              ).toLocaleDateString("fr-FR")}</span>
-            </div>
-            <div class="stat-row">
-              <span class="stat-label">Nombre de performances :</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Date du record :</span>
+                                <span class="stat-value">${new Date(
+                                  stat.bestDate
+                                ).toLocaleDateString("fr-FR")}</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Nombre de performances :</span>
               <span class="stat-value">${stat.performanceCount}</span>
-            </div>
-            <div class="stat-row">
-              <span class="stat-label">Score moyen :</span>
-              <span class="stat-value">${stat.averageScore} ${
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Score moyen :</span>
+                                <span class="stat-value">${stat.averageScore} ${
             stat.exercise.unit
           }</span>
-            </div>
-          </div>
-          
-          <div class="recent-performances">
-            <h5>Performances récentes :</h5>
-            <div class="performance-mini-list">
-              ${stat.recentPerformances
-                .map(
-                  (perf) => `
-                <div class="mini-performance">
-                  <span class="mini-date">${new Date(
-                    perf.date
-                  ).toLocaleDateString("fr-FR")}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="recent-performances">
+                            <h5>Performances récentes :</h5>
+                            <div class="performance-mini-list">
+                                ${stat.recentPerformances
+                                  .map(
+                                    (perf) => `
+                                    <div class="mini-performance">
+                                        <span class="mini-date">${new Date(
+                                          perf.date
+                                        ).toLocaleDateString("fr-FR")}</span>
                   <span class="mini-score">${perf.bestScore} ${
-                    stat.exercise.unit
-                  }</span>
-                </div>
-              `
-                )
-                .join("")}
-            </div>
-          </div>
-        </div>
-      `
+                                      stat.exercise.unit
+                                    }</span>
+                                    </div>
+                                `
+                                  )
+                                  .join("")}
+                            </div>
+                        </div>
+                    </div>
+                `
         )
         .join("")}
-    </div>
-  `;
+            </div>
+        `;
 
   // Ajouter un graphique global de progression
   statsHTML += `
-    <div class="chart-container">
+        <div class="chart-container">
       <h3>📈 Progression globale</h3>
       <canvas id="globalProgressChart" width="400" height="200"></canvas>
-    </div>
-  `;
+        </div>
+    `;
 
   document.getElementById("statsContent").innerHTML = statsHTML;
 
