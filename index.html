@@ -22,6 +22,9 @@
           <button class="btn btn-warning" onclick="finishTraining()">
             🏁 Fin d'entraînement
           </button>
+          <button class="btn btn-danger" onclick="resetAllData()">
+            🔄 Recommencer la séance
+          </button>
         </div>
       </div>
 
@@ -157,7 +160,12 @@
           </div>
         </div>
 
-        <button class="btn" onclick="addExercise()">Créer l'exercice</button>
+        <div class="action-buttons">
+          <button class="btn" onclick="addExercise()">Créer l'exercice</button>
+          <button class="btn btn-danger" onclick="resetExercises()">
+            🗑️ Reset exercices
+          </button>
+        </div>
 
         <div id="exercisesList" class="exercise-list">
           <!-- Les exercices seront affichés ici -->
@@ -176,7 +184,12 @@
             placeholder="Entrez le nom de la joueuse"
           />
         </div>
-        <button class="btn" onclick="addPlayer()">Ajouter une joueuse</button>
+        <div class="action-buttons">
+          <button class="btn" onclick="addPlayer()">Ajouter une joueuse</button>
+          <button class="btn btn-danger" onclick="resetPlayers()">
+            🗑️ Reset joueuses
+          </button>
+        </div>
 
         <div id="playersList" class="player-list">
           <!-- Les joueuses seront affichées ici -->
@@ -212,9 +225,14 @@
               <div class="attempts-grid" id="attemptsGrid">
                 <!-- Les champs de tentatives seront générés ici -->
               </div>
-              <button class="btn" onclick="savePerformance()">
-                Enregistrer la performance
-              </button>
+              <div class="action-buttons">
+                <button class="btn" onclick="savePerformance()">
+                  Enregistrer la performance
+                </button>
+                <button class="btn btn-danger" onclick="resetPerformances()">
+                  🗑️ Reset performances
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -241,7 +259,7 @@
           </div>
           <div class="form-group">
             <label for="statsPlayer">Joueuse (optionnel) :</label>
-            <select id="statsPlayer" onchange="updatePlayerChart()">
+            <select id="statsPlayer" onchange="updateStatsInterface()">
               <option value="">Toutes les joueuses</option>
             </select>
           </div>
