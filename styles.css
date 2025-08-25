@@ -10,12 +10,17 @@ body {
   min-height: 100vh;
   color: #2d3748;
   line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .header {
@@ -62,6 +67,12 @@ body {
   cursor: pointer;
   border-radius: 6px;
   transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .tab.active {
@@ -106,6 +117,11 @@ textarea {
   font-size: 14px;
   transition: all 0.2s ease;
   background: #ffffff;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  min-height: 44px;
+  box-sizing: border-box;
 }
 
 input:focus,
@@ -128,6 +144,12 @@ textarea:focus {
   transition: all 0.2s ease;
   margin-right: 10px;
   margin-bottom: 10px;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-secondary {
@@ -1083,133 +1105,230 @@ textarea:focus {
   color: #38a169;
 }
 
-@media (max-width: 768px) {
-  .tabs {
-    flex-direction: column;
-    gap: 4px;
+/* ===== RESPONSIVE DESIGN ===== */
+
+/* Tablette (768px - 1024px) */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .container {
+    padding: 15px;
   }
 
-  .tab {
-    padding: 10px 16px;
+  .header {
+    padding: 25px;
   }
 
-  .attempts-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .header h1 {
+    font-size: 2.2em;
+  }
+
+  .export-import-buttons {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .export-import-buttons .btn {
+    min-width: 160px;
+    font-size: 13px;
   }
 
   .exercise-list,
   .player-list {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 15px;
+  }
+
+  .exercise-selector {
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+
+  .series-config {
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+
+  .series-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  }
+
+  .modal-content {
+    width: 90%;
+    margin: 8% auto;
+  }
+}
+
+/* Mobile (768px et moins) */
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+
+  .header {
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .header h1 {
+    font-size: 1.8em;
+    margin-bottom: 8px;
+  }
+
+  .header p {
+    font-size: 1em;
+  }
+
+  /* Tabs */
+  .tabs {
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 20px;
+  }
+
+  .tab {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+
+  /* Contenu des onglets */
+  .tab-content {
+    padding: 15px;
+  }
+
+  .tab-content h2 {
+    font-size: 1.4em;
+    margin-bottom: 15px;
+  }
+
+  /* Formulaires */
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  .form-group label {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  input,
+  select,
+  textarea {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  /* Boutons */
+  .btn {
+    padding: 10px 16px;
+    font-size: 14px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+  }
+
+  /* Grilles */
+  .exercise-list,
+  .player-list {
     grid-template-columns: 1fr;
+    gap: 15px;
   }
 
   .exercise-selector {
     grid-template-columns: 1fr;
+    gap: 15px;
   }
 
-  .header h1 {
-    font-size: 2em;
+  .attempts-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
   }
 
-  .tab-content {
-    padding: 20px;
+  /* Configuration des séries */
+  .series-config {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 15px;
   }
 
-  /* Responsive pour les boutons radio */
-  .radio-group {
+  .series-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .series-grid input {
+    padding: 8px 6px;
+    font-size: 13px;
+  }
+
+  /* Boutons d'action */
+  .action-buttons {
     flex-direction: column;
-    gap: 12px;
+    align-items: center;
+    gap: 10px;
   }
 
-  .radio-option {
-    padding: 12px 16px;
-    background: #f7fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    margin-bottom: 4px;
+  .action-buttons .btn {
+    width: 100%;
+    max-width: 250px;
+    margin: 0;
   }
 
-  .radio-option:hover {
-    background: #edf2f7;
-    border-color: #4299e1;
-  }
-
-  /* Responsive pour les boutons d'export/import */
+  /* Boutons d'export/import */
   .export-import-buttons {
     flex-direction: column;
     align-items: center;
+    gap: 10px;
   }
 
   .export-import-buttons .btn {
     width: 100%;
-    max-width: 300px;
+    max-width: 280px;
+    margin: 0;
   }
 
-  /* Responsive pour le modal */
+  /* Boutons radio */
+  .radio-group {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .radio-option {
+    padding: 10px 12px;
+    font-size: 14px;
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+  }
+
+  /* Modals */
   .modal-content {
     width: 95%;
-    margin: 10% auto;
+    margin: 5% auto;
+    max-height: 90vh;
   }
 
   .modal-header,
   .modal-body {
-    padding: 20px;
+    padding: 15px;
+  }
+
+  .modal-header h3 {
+    font-size: 1.2em;
   }
 
   .import-actions {
     flex-direction: column;
+    gap: 10px;
   }
 
   .import-actions .btn {
     width: 100%;
   }
 
-  /* Responsive pour les résultats de performance */
-  .results-summary {
-    grid-template-columns: 1fr;
-    gap: 15px;
-  }
-
-  .attempts-list {
-    grid-template-columns: 1fr;
-  }
-
-  .results-actions {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .results-actions .btn {
-    width: 100%;
-    max-width: 200px;
-  }
-
-  /* Responsive pour les boutons d'action */
-  .action-buttons {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .action-buttons .btn {
-    width: 100%;
-    max-width: 200px;
-  }
-
-  /* Responsive pour la configuration des séries */
-  .series-config {
-    grid-template-columns: 1fr;
-    gap: 15px;
-  }
-
-  .series-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  /* Responsive pour les modals de confirmation */
+  /* Modals de confirmation */
   .confirm-modal,
   .success-modal,
   .error-modal {
     width: 95%;
-    margin: 5% auto;
+    margin: 10% auto;
   }
 
   .confirm-actions,
@@ -1217,6 +1336,7 @@ textarea:focus {
   .error-actions {
     flex-direction: column;
     align-items: center;
+    gap: 10px;
   }
 
   .confirm-actions .btn,
@@ -1225,16 +1345,184 @@ textarea:focus {
     width: 100%;
     max-width: 200px;
   }
-}
 
-@media (max-width: 480px) {
-  .radio-option {
-    font-size: 14px;
-    padding: 10px 12px;
+  /* Résultats de performance */
+  .results-summary {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 15px;
   }
 
+  .attempts-list {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .results-actions {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .results-actions .btn {
+    width: 100%;
+    max-width: 200px;
+  }
+
+  /* Statistiques */
+  .exercise-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .stat-item {
+    padding: 15px;
+  }
+
+  .stat-value {
+    font-size: 1.4em;
+  }
+
+  .stat-label {
+    font-size: 12px;
+  }
+
+  /* Cartes */
+  .exercise-card,
+  .player-card {
+    padding: 15px;
+  }
+
+  .exercise-name,
+  .player-name {
+    font-size: 1.1em;
+  }
+
+  .exercise-details {
+    font-size: 13px;
+  }
+}
+
+/* Petit mobile (480px et moins) */
+@media (max-width: 480px) {
+  .container {
+    padding: 8px;
+  }
+
+  .header {
+    padding: 15px;
+  }
+
+  .header h1 {
+    font-size: 1.6em;
+  }
+
+  .tab-content {
+    padding: 12px;
+  }
+
+  .tab-content h2 {
+    font-size: 1.3em;
+  }
+
+  /* Formulaires */
+  input,
+  select,
+  textarea {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .btn {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  /* Grilles */
+  .attempts-grid {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .series-grid {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .exercise-stats {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  /* Modals */
   .modal-content {
     width: 98%;
+    margin: 2% auto;
+  }
+
+  .modal-header,
+  .modal-body {
+    padding: 12px;
+  }
+
+  .confirm-modal,
+  .success-modal,
+  .error-modal {
+    width: 98%;
     margin: 5% auto;
+  }
+
+  /* Boutons */
+  .action-buttons .btn,
+  .export-import-buttons .btn,
+  .confirm-actions .btn,
+  .success-actions .btn,
+  .error-actions .btn {
+    max-width: none;
+  }
+
+  /* Radio options */
+  .radio-option {
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+
+  /* Cartes */
+  .exercise-card,
+  .player-card {
+    padding: 12px;
+  }
+
+  .exercise-name,
+  .player-name {
+    font-size: 1em;
+  }
+
+  .exercise-details {
+    font-size: 12px;
+  }
+}
+
+/* Très petit mobile (320px et moins) */
+@media (max-width: 320px) {
+  .header h1 {
+    font-size: 1.4em;
+  }
+
+  .tab {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .btn {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  input,
+  select,
+  textarea {
+    padding: 6px 8px;
+    font-size: 12px;
   }
 }
