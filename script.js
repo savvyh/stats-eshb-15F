@@ -63,7 +63,7 @@ function addExercise() {
   ).value;
 
   if (!name) {
-    alert("Veuillez saisir un nom d'exercice");
+    showErrorModal("❌ Erreur", "Veuillez saisir un nom d'exercice", "❌");
     return;
   }
 
@@ -125,12 +125,18 @@ function getExerciseTypeLabel(type) {
 }
 
 function deleteExercise(id) {
-  if (confirm("Êtes-vous sûr de vouloir supprimer cet exercice ?")) {
-    exercises = exercises.filter((e) => e.id !== id);
-    performances = performances.filter((p) => p.exerciseId !== id);
-    saveData();
-    updateInterface();
-  }
+  showConfirmModal(
+    "🗑️ Supprimer l'exercice",
+    "Êtes-vous sûr de vouloir supprimer cet exercice ?",
+    "⚠️",
+    "delete",
+    function () {
+      exercises = exercises.filter((e) => e.id !== id);
+      performances = performances.filter((p) => p.exerciseId !== id);
+      saveData();
+      updateInterface();
+    }
+  );
 }
 
 // ===== GESTION DES JOUEUSES =====
@@ -139,7 +145,7 @@ function addPlayer() {
   const name = document.getElementById("playerName").value.trim();
 
   if (!name) {
-    alert("Veuillez saisir un nom de joueuse");
+    showErrorModal("❌ Erreur", "Veuillez saisir un nom de joueuse", "❌");
     return;
   }
 
@@ -184,12 +190,18 @@ function updatePlayersList() {
 }
 
 function deletePlayer(id) {
-  if (confirm("Êtes-vous sûr de vouloir supprimer cette joueuse ?")) {
-    players = players.filter((p) => p.id !== id);
-    performances = performances.filter((p) => p.playerId !== id);
-    saveData();
-    updateInterface();
-  }
+  showConfirmModal(
+    "🗑️ Supprimer la joueuse",
+    "Êtes-vous sûr de vouloir supprimer cette joueuse ?",
+    "⚠️",
+    "delete",
+    function () {
+      players = players.filter((p) => p.id !== id);
+      performances = performances.filter((p) => p.playerId !== id);
+      saveData();
+      updateInterface();
+    }
+  );
 }
 
 // ===== GESTION DES PERFORMANCES =====
@@ -340,7 +352,11 @@ function savePerformance() {
   const playerId = document.getElementById("perfPlayer").value;
 
   if (!exerciseId || !playerId) {
-    alert("Veuillez sélectionner un exercice et une joueuse");
+    showErrorModal(
+      "❌ Erreur",
+      "Veuillez sélectionner un exercice et une joueuse",
+      "❌"
+    );
     return;
   }
 
@@ -371,7 +387,11 @@ function savePerformance() {
   }
 
   if (allAttempts.length === 0) {
-    alert("Veuillez saisir au moins une performance");
+    showErrorModal(
+      "❌ Erreur",
+      "Veuillez saisir au moins une performance",
+      "❌"
+    );
     return;
   }
 
@@ -407,7 +427,7 @@ function savePerformance() {
   // Reset form
   resetPerformanceForm();
 
-  alert("Performance enregistrée avec succès !");
+  showSuccessModal("✅ Succès", "Performance enregistrée avec succès !", "✅");
 }
 
 function resetPerformanceForm() {
@@ -579,10 +599,18 @@ function exportToExcel() {
     // Télécharger le fichier
     XLSX.writeFile(workbook, fileName);
 
-    alert("Export Excel réussi ! Fichier téléchargé : " + fileName);
+    showSuccessModal(
+      "✅ Export réussi",
+      "Fichier téléchargé : " + fileName,
+      "✅"
+    );
   } catch (error) {
     console.error("Erreur lors de l'export:", error);
-    alert("Erreur lors de l'export Excel. Veuillez réessayer.");
+    showErrorModal(
+      "❌ Erreur d'export",
+      "Erreur lors de l'export Excel. Veuillez réessayer.",
+      "❌"
+    );
   }
 }
 
@@ -617,8 +645,10 @@ function previewExcelFile() {
       );
 
       if (missingSheets.length > 0) {
-        alert(
-          `Fichier invalide. Feuilles manquantes : ${missingSheets.join(", ")}`
+        showErrorModal(
+          "❌ Fichier invalide",
+          `Fichier invalide. Feuilles manquantes : ${missingSheets.join(", ")}`,
+          "❌"
         );
         return;
       }
@@ -637,8 +667,10 @@ function previewExcelFile() {
       displayImportPreview(importData, conflicts);
     } catch (error) {
       console.error("Erreur lors de la lecture du fichier:", error);
-      alert(
-        "Erreur lors de la lecture du fichier Excel. Veuillez vérifier le format."
+      showErrorModal(
+        "❌ Erreur de lecture",
+        "Erreur lors de la lecture du fichier Excel. Veuillez vérifier le format.",
+        "❌"
       );
     }
   };
@@ -841,12 +873,18 @@ function confirmImport() {
     updateInterface();
     closeImportModal();
 
-    alert(
-      `Import réussi ! ${importData.exercises.length} exercices, ${importData.players.length} joueuses et ${importData.performances.length} performances importés.`
+    showSuccessModal(
+      "✅ Import réussi",
+      `${importData.exercises.length} exercices, ${importData.players.length} joueuses et ${importData.performances.length} performances importés.`,
+      "✅"
     );
   } catch (error) {
     console.error("Erreur lors de l'import:", error);
-    alert("Erreur lors de l'import. Veuillez réessayer.");
+    showErrorModal(
+      "❌ Erreur d'import",
+      "Erreur lors de l'import. Veuillez réessayer.",
+      "❌"
+    );
   }
 }
 
@@ -863,12 +901,20 @@ function getExerciseTypeFromLabel(label) {
 // ===== FONCTION FIN D'ENTRAÎNEMENT =====
 
 function finishTraining() {
-  if (
-    confirm("Voulez-vous terminer l'entraînement et exporter les données ?")
-  ) {
-    exportToExcel();
-    alert("Entraînement terminé ! Les données ont été exportées.");
-  }
+  showConfirmModal(
+    "🏁 Fin d'entraînement",
+    "Voulez-vous terminer l'entraînement et exporter les données ?",
+    "🏁",
+    "finish",
+    function () {
+      exportToExcel();
+      showSuccessModal(
+        "✅ Entraînement terminé",
+        "Les données ont été exportées.",
+        "✅"
+      );
+    }
+  );
 }
 
 // ===== GESTION DES STATISTIQUES =====
@@ -1567,140 +1613,219 @@ function createPerformanceChart(exerciseId, playerId) {
 // ===== FONCTIONS DE RESET =====
 
 function resetAllData() {
-  if (
-    confirm(
-      "⚠️ Êtes-vous sûr de vouloir recommencer la séance ?\n\nCette action supprimera TOUTES les données :\n- Tous les exercices\n- Toutes les joueuses\n- Toutes les performances\n\nCette action est irréversible !"
-    )
-  ) {
-    exercises = [];
-    players = [];
-    performances = [];
-    saveData();
-    updateInterface();
+  showConfirmModal(
+    "🔄 Recommencer la séance",
+    "⚠️ Êtes-vous sûr de vouloir recommencer la séance ?\n\nCette action supprimera TOUTES les données :\n- Tous les exercices\n- Toutes les joueuses\n- Toutes les performances\n\nCette action est irréversible !",
+    "⚠️",
+    "reset",
+    function () {
+      exercises = [];
+      players = [];
+      performances = [];
+      saveData();
+      updateInterface();
 
-    // Réinitialiser les formulaires
-    document.getElementById("exerciseName").value = "";
-    document.getElementById("exerciseDescription").value = "";
-    document.getElementById("playerName").value = "";
+      // Réinitialiser les formulaires
+      document.getElementById("exerciseName").value = "";
+      document.getElementById("exerciseDescription").value = "";
+      document.getElementById("playerName").value = "";
 
-    // Réinitialiser les sélecteurs
-    document.getElementById("perfExercise").innerHTML =
-      '<option value="">Sélectionnez un exercice</option>';
-    document.getElementById("perfPlayer").innerHTML =
-      '<option value="">Sélectionnez une joueuse</option>';
-    document.getElementById("statsExercise").innerHTML =
-      '<option value="">Sélectionnez un exercice</option>';
-    document.getElementById("statsPlayer").innerHTML =
-      '<option value="">Toutes les joueuses</option>';
+      // Réinitialiser les sélecteurs
+      document.getElementById("perfExercise").innerHTML =
+        '<option value="">Sélectionnez un exercice</option>';
+      document.getElementById("perfPlayer").innerHTML =
+        '<option value="">Sélectionnez une joueuse</option>';
+      document.getElementById("statsExercise").innerHTML =
+        '<option value="">Sélectionnez un exercice</option>';
+      document.getElementById("statsPlayer").innerHTML =
+        '<option value="">Toutes les joueuses</option>';
 
-    // Masquer les interfaces
-    document.getElementById("performanceInterface").style.display = "none";
-    document.getElementById("currentPlayerStats").style.display = "none";
-    document.getElementById("statsContent").innerHTML = `
+      // Masquer les interfaces
+      document.getElementById("performanceInterface").style.display = "none";
+      document.getElementById("currentPlayerStats").style.display = "none";
+      document.getElementById("statsContent").innerHTML = `
       <div class="no-data">
         <h3>📊 Sélectionnez un exercice pour voir les statistiques</h3>
         <p>Les graphiques d'évolution et de comparaison s'afficheront ici</p>
       </div>
     `;
 
-    alert("✅ Séance réinitialisée avec succès !");
-  }
+      showSuccessModal("✅ Succès", "Séance réinitialisée avec succès !", "✅");
+    }
+  );
 }
 
 function resetExercises() {
-  if (
-    confirm(
-      "⚠️ Êtes-vous sûr de vouloir supprimer TOUS les exercices ?\n\nCette action supprimera également toutes les performances associées.\n\nCette action est irréversible !"
-    )
-  ) {
-    exercises = [];
-    // Supprimer aussi les performances car elles dépendent des exercices
-    performances = performances.filter((p) => false); // Supprime tout
-    saveData();
-    updateInterface();
+  showConfirmModal(
+    "🗑️ Supprimer les exercices",
+    "⚠️ Êtes-vous sûr de vouloir supprimer TOUS les exercices ?\n\nCette action supprimera également toutes les performances associées.\n\nCette action est irréversible !",
+    "⚠️",
+    "reset",
+    function () {
+      exercises = [];
+      // Supprimer aussi les performances car elles dépendent des exercices
+      performances = performances.filter((p) => false); // Supprime tout
+      saveData();
+      updateInterface();
 
-    // Réinitialiser le formulaire
-    document.getElementById("exerciseName").value = "";
-    document.getElementById("exerciseDescription").value = "";
-    document.querySelector(
-      'input[name="exerciseType"][value="time_fast"]'
-    ).checked = true;
+      // Réinitialiser le formulaire
+      document.getElementById("exerciseName").value = "";
+      document.getElementById("exerciseDescription").value = "";
+      document.querySelector(
+        'input[name="exerciseType"][value="time_fast"]'
+      ).checked = true;
 
-    // Réinitialiser les sélecteurs
-    document.getElementById("perfExercise").innerHTML =
-      '<option value="">Sélectionnez un exercice</option>';
-    document.getElementById("statsExercise").innerHTML =
-      '<option value="">Sélectionnez un exercice</option>';
+      // Réinitialiser les sélecteurs
+      document.getElementById("perfExercise").innerHTML =
+        '<option value="">Sélectionnez un exercice</option>';
+      document.getElementById("statsExercise").innerHTML =
+        '<option value="">Sélectionnez un exercice</option>';
 
-    // Masquer les interfaces
-    document.getElementById("performanceInterface").style.display = "none";
-    document.getElementById("currentPlayerStats").style.display = "none";
-    document.getElementById("statsContent").innerHTML = `
+      // Masquer les interfaces
+      document.getElementById("performanceInterface").style.display = "none";
+      document.getElementById("currentPlayerStats").style.display = "none";
+      document.getElementById("statsContent").innerHTML = `
       <div class="no-data">
         <h3>📊 Sélectionnez un exercice pour voir les statistiques</h3>
         <p>Les graphiques d'évolution et de comparaison s'afficheront ici</p>
       </div>
     `;
 
-    alert("✅ Exercices supprimés avec succès !");
-  }
+      showSuccessModal("✅ Succès", "Exercices supprimés avec succès !", "✅");
+    }
+  );
 }
 
 function resetPlayers() {
-  if (
-    confirm(
-      "⚠️ Êtes-vous sûr de vouloir supprimer TOUTES les joueuses ?\n\nCette action supprimera également toutes les performances associées.\n\nCette action est irréversible !"
-    )
-  ) {
-    players = [];
-    // Supprimer aussi les performances car elles dépendent des joueuses
-    performances = performances.filter((p) => false); // Supprime tout
-    saveData();
-    updateInterface();
+  showConfirmModal(
+    "🗑️ Supprimer les joueuses",
+    "⚠️ Êtes-vous sûr de vouloir supprimer TOUTES les joueuses ?\n\nCette action supprimera également toutes les performances associées.\n\nCette action est irréversible !",
+    "⚠️",
+    "reset",
+    function () {
+      players = [];
+      // Supprimer aussi les performances car elles dépendent des joueuses
+      performances = performances.filter((p) => false); // Supprime tout
+      saveData();
+      updateInterface();
 
-    // Réinitialiser le formulaire
-    document.getElementById("playerName").value = "";
+      // Réinitialiser le formulaire
+      document.getElementById("playerName").value = "";
 
-    // Réinitialiser les sélecteurs
-    document.getElementById("perfPlayer").innerHTML =
-      '<option value="">Sélectionnez une joueuse</option>';
-    document.getElementById("statsPlayer").innerHTML =
-      '<option value="">Toutes les joueuses</option>';
+      // Réinitialiser les sélecteurs
+      document.getElementById("perfPlayer").innerHTML =
+        '<option value="">Sélectionnez une joueuse</option>';
+      document.getElementById("statsPlayer").innerHTML =
+        '<option value="">Toutes les joueuses</option>';
 
-    // Masquer les interfaces
-    document.getElementById("performanceInterface").style.display = "none";
-    document.getElementById("currentPlayerStats").style.display = "none";
-    document.getElementById("statsContent").innerHTML = `
+      // Masquer les interfaces
+      document.getElementById("performanceInterface").style.display = "none";
+      document.getElementById("currentPlayerStats").style.display = "none";
+      document.getElementById("statsContent").innerHTML = `
       <div class="no-data">
         <h3>📊 Sélectionnez un exercice pour voir les statistiques</h3>
         <p>Les graphiques d'évolution et de comparaison s'afficheront ici</p>
       </div>
     `;
 
-    alert("✅ Joueuses supprimées avec succès !");
-  }
+      showSuccessModal("✅ Succès", "Joueuses supprimées avec succès !", "✅");
+    }
+  );
 }
 
 function resetPerformances() {
-  if (
-    confirm(
-      "⚠️ Êtes-vous sûr de vouloir supprimer TOUTES les performances ?\n\nCette action est irréversible !"
-    )
-  ) {
-    performances = [];
-    saveData();
-    updateInterface();
+  showConfirmModal(
+    "🗑️ Supprimer les performances",
+    "⚠️ Êtes-vous sûr de vouloir supprimer TOUTES les performances ?\n\nCette action est irréversible !",
+    "⚠️",
+    "reset",
+    function () {
+      performances = [];
+      saveData();
+      updateInterface();
 
-    // Masquer les interfaces
-    document.getElementById("performanceInterface").style.display = "none";
-    document.getElementById("currentPlayerStats").style.display = "none";
-    document.getElementById("statsContent").innerHTML = `
+      // Masquer les interfaces
+      document.getElementById("performanceInterface").style.display = "none";
+      document.getElementById("currentPlayerStats").style.display = "none";
+      document.getElementById("statsContent").innerHTML = `
       <div class="no-data">
         <h3>📊 Sélectionnez un exercice pour voir les statistiques</h3>
         <p>Les graphiques d'évolution et de comparaison s'afficheront ici</p>
       </div>
     `;
 
-    alert("✅ Performances supprimées avec succès !");
-  }
+      showSuccessModal(
+        "✅ Succès",
+        "Performances supprimées avec succès !",
+        "✅"
+      );
+    }
+  );
 }
+
+// ===== FONCTIONS POUR LES MODALS =====
+
+// Variables globales pour les modals
+let confirmCallback = null;
+let confirmAction = null;
+
+// Fonction pour afficher un modal de confirmation
+function showConfirmModal(title, message, icon, action, callback) {
+  document.getElementById("confirmTitle").textContent = title;
+  document.getElementById("confirmMessage").textContent = message;
+  document.getElementById("confirmIcon").textContent = icon;
+  confirmAction = action;
+  confirmCallback = callback;
+  document.getElementById("confirmModal").style.display = "block";
+}
+
+// Fonction pour fermer le modal de confirmation
+function closeConfirmModal() {
+  document.getElementById("confirmModal").style.display = "none";
+  confirmCallback = null;
+  confirmAction = null;
+}
+
+// Fonction pour exécuter l'action confirmée
+function executeConfirmAction() {
+  if (confirmCallback) {
+    confirmCallback();
+  }
+  closeConfirmModal();
+}
+
+// Fonction pour afficher un modal de succès
+function showSuccessModal(title, message, icon = "✅") {
+  document.getElementById("successTitle").textContent = title;
+  document.getElementById("successMessage").textContent = message;
+  document.getElementById("successIcon").textContent = icon;
+  document.getElementById("successModal").style.display = "block";
+}
+
+// Fonction pour fermer le modal de succès
+function closeSuccessModal() {
+  document.getElementById("successModal").style.display = "none";
+}
+
+// Fonction pour afficher un modal d'erreur
+function showErrorModal(title, message, icon = "❌") {
+  document.getElementById("errorTitle").textContent = title;
+  document.getElementById("errorMessage").textContent = message;
+  document.getElementById("errorIcon").textContent = icon;
+  document.getElementById("errorModal").style.display = "block";
+}
+
+// Fonction pour fermer le modal d'erreur
+function closeErrorModal() {
+  document.getElementById("errorModal").style.display = "none";
+}
+
+// Fermer les modals en cliquant à l'extérieur
+window.onclick = function (event) {
+  const modals = document.querySelectorAll(".modal");
+  modals.forEach((modal) => {
+    if (event.target === modal) {
+      modal.style.display = "none";
+    }
+  });
+};

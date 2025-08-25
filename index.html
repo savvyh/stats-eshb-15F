@@ -78,6 +78,72 @@
         </div>
       </div>
 
+      <!-- Modal de confirmation générique -->
+      <div id="confirmModal" class="modal" style="display: none">
+        <div class="modal-content confirm-modal">
+          <div class="modal-header">
+            <h3 id="confirmTitle">Confirmation</h3>
+            <span class="close" onclick="closeConfirmModal()">&times;</span>
+          </div>
+          <div class="modal-body">
+            <div class="confirm-content">
+              <div class="confirm-icon" id="confirmIcon">❓</div>
+              <p id="confirmMessage">Êtes-vous sûr de vouloir continuer ?</p>
+            </div>
+            <div class="confirm-actions">
+              <button
+                class="btn"
+                id="confirmActionBtn"
+                onclick="executeConfirmAction()"
+              >
+                Confirmer
+              </button>
+              <button class="btn btn-secondary" onclick="closeConfirmModal()">
+                Annuler
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal de succès -->
+      <div id="successModal" class="modal" style="display: none">
+        <div class="modal-content success-modal">
+          <div class="modal-header">
+            <h3 id="successTitle">Succès</h3>
+            <span class="close" onclick="closeSuccessModal()">&times;</span>
+          </div>
+          <div class="modal-body">
+            <div class="success-content">
+              <div class="success-icon" id="successIcon">✅</div>
+              <p id="successMessage">Opération réussie !</p>
+            </div>
+            <div class="success-actions">
+              <button class="btn" onclick="closeSuccessModal()">Fermer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal d'erreur -->
+      <div id="errorModal" class="modal" style="display: none">
+        <div class="modal-content error-modal">
+          <div class="modal-header">
+            <h3 id="errorTitle">Erreur</h3>
+            <span class="close" onclick="closeErrorModal()">&times;</span>
+          </div>
+          <div class="modal-body">
+            <div class="error-content">
+              <div class="error-icon" id="errorIcon">❌</div>
+              <p id="errorMessage">Une erreur s'est produite.</p>
+            </div>
+            <div class="error-actions">
+              <button class="btn" onclick="closeErrorModal()">Fermer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="tabs">
         <button class="tab active" onclick="showTab('exercises')">
           Exercices

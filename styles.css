@@ -511,6 +511,92 @@ textarea:focus {
   margin-bottom: 20px;
 }
 
+/* Styles pour les modals de confirmation, succès et erreur */
+.confirm-modal,
+.success-modal,
+.error-modal {
+  max-width: 500px;
+  margin: 10% auto;
+}
+
+.confirm-content,
+.success-content,
+.error-content {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.confirm-icon,
+.success-icon,
+.error-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+}
+
+.confirm-icon {
+  color: #4299e1;
+}
+
+.success-icon {
+  color: #48bb78;
+}
+
+.error-icon {
+  color: #f56565;
+}
+
+.confirm-content p,
+.success-content p,
+.error-content p {
+  font-size: 16px;
+  color: #2d3748;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.confirm-actions,
+.success-actions,
+.error-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.confirm-actions .btn,
+.success-actions .btn,
+.error-actions .btn {
+  min-width: 120px;
+}
+
+/* Couleurs spécifiques pour les headers */
+.confirm-modal .modal-header {
+  background: #ebf8ff;
+  border-bottom-color: #4299e1;
+}
+
+.success-modal .modal-header {
+  background: #f0fff4;
+  border-bottom-color: #48bb78;
+}
+
+.error-modal .modal-header {
+  background: #fed7d7;
+  border-bottom-color: #f56565;
+}
+
+.confirm-modal .modal-header h3 {
+  color: #2b6cb0;
+}
+
+.success-modal .modal-header h3 {
+  color: #2f855a;
+}
+
+.error-modal .modal-header h3 {
+  color: #c53030;
+}
+
 .conflicts-section h4 {
   color: #744210;
   margin-bottom: 15px;
@@ -1116,6 +1202,28 @@ textarea:focus {
 
   .series-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Responsive pour les modals de confirmation */
+  .confirm-modal,
+  .success-modal,
+  .error-modal {
+    width: 95%;
+    margin: 5% auto;
+  }
+
+  .confirm-actions,
+  .success-actions,
+  .error-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .confirm-actions .btn,
+  .success-actions .btn,
+  .error-actions .btn {
+    width: 100%;
+    max-width: 200px;
   }
 }
 
