@@ -372,7 +372,24 @@ textarea:focus {
   border-radius: 6px;
   transition: all 0.2s ease;
   cursor: pointer;
-  border: 1px solid transparent;
+  border: 1px solid #e2e8f0;
+  background: #f7fafc;
+  position: relative;
+}
+
+.radio-option input[type="radio"]:checked + span {
+  color: #2d3748;
+  font-weight: 600;
+}
+
+.radio-option input[type="radio"]:checked {
+  accent-color: #4299e1;
+}
+
+.radio-option:has(input[type="radio"]:checked) {
+  background: #ebf8ff;
+  border-color: #4299e1;
+  box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.1);
 }
 
 .radio-option input[type="radio"] {
@@ -1087,113 +1104,265 @@ textarea:focus {
 
 @media (max-width: 1024px) and (min-width: 769px) {
   .container {
-    padding: 15px;
+    padding: 20px;
   }
 
   .header {
-    padding: 25px;
+    padding: 30px;
   }
 
   .header h1 {
-    font-size: 2.2em;
+    font-size: 2.4em;
   }
 
   .btn {
-    margin-right: 12px;
-    margin-bottom: 12px;
-    padding: 14px 20px;
-    font-size: 14px;
-    min-width: 140px;
+    margin-right: 15px;
+    margin-bottom: 15px;
+    padding: 16px 24px;
+    font-size: 15px;
+    min-width: 160px;
+    border-radius: 10px;
   }
 
   .export-import-buttons {
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 20px;
     justify-content: center;
+    margin-top: 25px;
   }
 
   .export-import-buttons .btn {
-    min-width: 170px;
-    font-size: 14px;
+    min-width: 200px;
+    font-size: 15px;
     margin: 0;
+    padding: 18px 28px;
   }
 
   .action-buttons {
-    gap: 15px;
+    gap: 20px;
     justify-content: flex-start;
+    flex-wrap: wrap;
   }
 
   .action-buttons .btn {
-    min-width: 150px;
+    min-width: 180px;
     margin: 0;
+    padding: 16px 24px;
   }
 
   .confirm-actions .btn,
   .success-actions .btn,
   .error-actions .btn {
-    min-width: 120px;
-    margin: 0 8px;
+    min-width: 140px;
+    margin: 0 12px;
+    padding: 14px 20px;
   }
 
   .import-actions .btn {
-    min-width: 130px;
-    margin: 0 10px;
+    min-width: 160px;
+    margin: 0 15px;
+    padding: 16px 24px;
   }
 
   .exercise-list,
   .player-list {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 18px;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 25px;
   }
 
   .exercise-selector {
     grid-template-columns: 1fr 1fr;
-    gap: 18px;
+    gap: 25px;
   }
 
   .series-config {
     grid-template-columns: 1fr 1fr;
-    gap: 18px;
+    gap: 25px;
   }
 
   .series-grid {
-    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 15px;
   }
 
   .modal-content {
-    width: 85%;
-    margin: 6% auto;
+    width: 80%;
+    margin: 5% auto;
   }
 
   .tabs {
-    gap: 6px;
-    padding: 6px;
+    gap: 8px;
+    padding: 8px;
   }
 
   .tab {
-    padding: 14px 18px;
-    font-size: 14px;
+    padding: 16px 22px;
+    font-size: 15px;
+    border-radius: 8px;
   }
 
   .tab-content {
-    padding: 25px;
+    padding: 30px;
   }
 
   .tab-content h2 {
-    font-size: 1.6em;
-    margin-bottom: 20px;
+    font-size: 1.8em;
+    margin-bottom: 25px;
   }
 
   .form-group {
-    margin-bottom: 18px;
+    margin-bottom: 22px;
   }
 
   input,
   select,
   textarea {
-    padding: 12px 14px;
-    font-size: 14px;
+    padding: 14px 18px;
+    font-size: 15px;
+    border-radius: 8px;
+  }
+
+  .radio-group {
+    gap: 25px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+  }
+
+  .radio-option {
+    padding: 12px 18px;
+    font-size: 15px;
+    border-radius: 8px;
+    min-width: 160px;
+  }
+
+  .exercise-card,
+  .player-card {
+    padding: 25px;
+    border-radius: 12px;
+  }
+
+  .exercise-name,
+  .player-name {
+    font-size: 1.3em;
+    margin-bottom: 15px;
+  }
+
+  .exercise-details {
+    padding: 20px;
+    border-radius: 10px;
+  }
+}
+
+@media (min-width: 1025px) and (max-width: 1536px) {
+  .container {
+    padding: 25px;
+    max-width: 1400px;
+  }
+
+  .header {
+    padding: 35px;
+  }
+
+  .header h1 {
+    font-size: 2.6em;
+  }
+
+  .btn {
+    margin-right: 18px;
+    margin-bottom: 18px;
+    padding: 18px 28px;
+    font-size: 16px;
+    min-width: 180px;
+    border-radius: 12px;
+  }
+
+  .export-import-buttons {
+    gap: 25px;
+    margin-top: 30px;
+  }
+
+  .export-import-buttons .btn {
+    min-width: 220px;
+    font-size: 16px;
+    padding: 20px 32px;
+  }
+
+  .action-buttons {
+    gap: 25px;
+  }
+
+  .action-buttons .btn {
+    min-width: 200px;
+    padding: 18px 28px;
+  }
+
+  .exercise-list,
+  .player-list {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 30px;
+  }
+
+  .exercise-selector {
+    gap: 30px;
+  }
+
+  .series-config {
+    gap: 30px;
+  }
+
+  .series-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 18px;
+  }
+
+  .tab-content {
+    padding: 35px;
+  }
+
+  .tab-content h2 {
+    font-size: 2em;
+    margin-bottom: 30px;
+  }
+
+  .form-group {
+    margin-bottom: 25px;
+  }
+
+  input,
+  select,
+  textarea {
+    padding: 16px 20px;
+    font-size: 16px;
+    border-radius: 10px;
+  }
+
+  .radio-group {
+    gap: 30px;
+    margin-top: 20px;
+  }
+
+  .radio-option {
+    padding: 14px 20px;
+    font-size: 16px;
+    border-radius: 10px;
+    min-width: 180px;
+  }
+
+  .exercise-card,
+  .player-card {
+    padding: 30px;
+    border-radius: 15px;
+  }
+
+  .exercise-name,
+  .player-name {
+    font-size: 1.4em;
+    margin-bottom: 18px;
+  }
+
+  .exercise-details {
+    padding: 25px;
+    border-radius: 12px;
   }
 }
 
@@ -1253,10 +1422,11 @@ textarea:focus {
   }
 
   .btn {
-    padding: 10px 16px;
+    padding: 12px 18px;
     font-size: 14px;
-    margin-right: 8px;
-    margin-bottom: 8px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    min-width: 120px;
   }
 
   .exercise-list,
@@ -1294,38 +1464,42 @@ textarea:focus {
   .action-buttons {
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
   }
 
   .action-buttons .btn {
     width: 100%;
-    max-width: 250px;
+    max-width: 280px;
     margin: 0;
+    padding: 14px 20px;
   }
 
   .export-import-buttons {
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
   }
 
   .export-import-buttons .btn {
     width: 100%;
-    max-width: 280px;
+    max-width: 300px;
     margin: 0;
+    padding: 16px 24px;
   }
 
   .radio-group {
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
   }
 
   .radio-option {
-    padding: 10px 12px;
+    padding: 12px 16px;
     font-size: 14px;
     background: #f7fafc;
     border: 1px solid #e2e8f0;
-    border-radius: 6px;
+    border-radius: 8px;
+    width: 100%;
+    min-width: auto;
   }
 
   .modal-content {
