@@ -3,279 +3,245 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Suivi des Performances Sportives</title>
+    <title>Suivi des Performances</title>
     <link rel="stylesheet" href="styles.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   </head>
   <body>
-    <div class="container">
-      <div class="header">
-        <h1>🏃‍♀️ Suivi des Performances -15F</h1>
-        <div class="export-import-buttons">
-          <button class="btn btn-secondary" onclick="exportToExcel()">
-            📊 Exporter vers Excel
+    <div class="dashboard">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <div class="sidebar-header">
+          <h1>🏃‍♀️ Dashboard</h1>
+        </div>
+
+        <nav class="sidebar-nav">
+          <button class="nav-item active" onclick="showSection('gestion')">
+            <span class="nav-icon">⚙️</span>
+            <span class="nav-text">Gestion</span>
           </button>
-          <button class="btn btn-secondary" onclick="importFromExcel()">
-            📂 Importer depuis Excel
+
+          <button class="nav-item" onclick="showSection('seances')">
+            <span class="nav-icon">📋</span>
+            <span class="nav-text">Séances</span>
           </button>
-          <button class="btn btn-warning" onclick="finishTraining()">
+
+          <button class="nav-item" onclick="showSection('analyses')">
+            <span class="nav-icon">📊</span>
+            <span class="nav-text">Analyses</span>
+          </button>
+
+          <button class="nav-item" onclick="showSection('outils')">
+            <span class="nav-icon">🛠️</span>
+            <span class="nav-text">Outils</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-footer">
+          <button class="btn btn-danger" onclick="finishTraining()">
             🏁 Fin d'entraînement
           </button>
-          <button class="btn btn-danger" onclick="resetAllData()">
-            🔄 Recommencer la séance
-          </button>
         </div>
       </div>
 
-      <div id="importModal" class="modal" style="display: none">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h3>📂 Import Excel</h3>
-            <span class="close" onclick="closeImportModal()">&times;</span>
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Gestion Section -->
+        <div id="gestion" class="content-section active">
+          <div class="section-header">
+            <h3>⚙️ Gérer les exercices et joueuses</h3>
           </div>
-          <div class="modal-body">
-            <div class="file-upload-section">
-              <input
-                type="file"
-                id="excelFile"
-                accept=".xlsx,.xls"
-                onchange="previewExcelFile()"
-              />
-              <p class="file-info">
-                Sélectionnez un fichier Excel (.xlsx ou .xls)
-              </p>
-            </div>
 
-            <div
-              id="importPreview"
-              class="import-preview"
-              style="display: none"
+          <div class="management-tabs">
+            <button
+              class="management-tab active"
+              onclick="showManagementTab('exercices')"
             >
-              <h4>Aperçu des données à importer :</h4>
-              <div id="previewContent"></div>
+              Exercices
+            </button>
+            <button
+              class="management-tab"
+              onclick="showManagementTab('joueuses')"
+            >
+              Joueuses
+            </button>
+          </div>
 
-              <div
-                id="conflictsSection"
-                class="conflicts-section"
-                style="display: none"
-              >
-                <h4>⚠️ Conflits détectés :</h4>
-                <div id="conflictsList"></div>
+          <!-- Exercices Management -->
+          <div id="exercices-management" class="management-content active">
+            <div class="form-card">
+              <h3>Ajouter un exercice</h3>
+              <div class="form-group">
+                <label for="exerciseName">Nom de l'exercice :</label>
+                <input
+                  type="text"
+                  id="exerciseName"
+                  placeholder="Ex: Sprint 20m"
+                />
               </div>
 
-              <div class="import-actions">
-                <button class="btn btn-secondary" onclick="confirmImport()">
-                  ✅ Confirmer l'import
-                </button>
-                <button class="btn btn-danger" onclick="closeImportModal()">
-                  ❌ Annuler
+              <div class="form-group">
+                <label for="exerciseUnit">Unité de mesure :</label>
+                <input
+                  type="text"
+                  id="exerciseUnit"
+                  placeholder="Ex: secondes, mètres, kg"
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Type de performance :</label>
+                <div class="radio-group">
+                  <label class="radio-option">
+                    <input
+                      type="radio"
+                      name="exerciseType"
+                      value="time_fast"
+                      checked
+                    />
+                    <span>Temps le plus rapide</span>
+                  </label>
+                  <label class="radio-option">
+                    <input type="radio" name="exerciseType" value="time_slow" />
+                    <span>Temps le plus long</span>
+                  </label>
+                  <label class="radio-option">
+                    <input
+                      type="radio"
+                      name="exerciseType"
+                      value="distance_short"
+                    />
+                    <span>Distance la plus courte</span>
+                  </label>
+                  <label class="radio-option">
+                    <input
+                      type="radio"
+                      name="exerciseType"
+                      value="distance_long"
+                    />
+                    <span>Distance la plus lointaine</span>
+                  </label>
+                  <label class="radio-option">
+                    <input
+                      type="radio"
+                      name="exerciseType"
+                      value="height_highest"
+                    />
+                    <span>Palier le plus haut</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="exerciseDescription"
+                  >Description (optionnel) :</label
+                >
+                <textarea
+                  id="exerciseDescription"
+                  placeholder="Description de l'exercice..."
+                ></textarea>
+              </div>
+
+              <button class="btn" onclick="addExercise()">
+                Ajouter l'exercice
+              </button>
+            </div>
+
+            <div class="list-card">
+              <h3>Exercices existants</h3>
+              <div class="action-buttons">
+                <button class="btn btn-danger" onclick="resetExercises()">
+                  🗑️ Reset exercices
                 </button>
               </div>
+              <div id="exercisesList" class="exercise-list"></div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div id="confirmModal" class="modal" style="display: none">
-        <div class="modal-content confirm-modal">
-          <div class="modal-header">
-            <h3 id="confirmTitle">Confirmation</h3>
-            <span class="close" onclick="closeConfirmModal()">&times;</span>
-          </div>
-          <div class="modal-body">
-            <div class="confirm-content">
-              <div class="confirm-icon" id="confirmIcon">❓</div>
-              <p id="confirmMessage">Êtes-vous sûr de vouloir continuer ?</p>
-            </div>
-            <div class="confirm-actions">
-              <button
-                class="btn"
-                id="confirmActionBtn"
-                onclick="executeConfirmAction()"
-              >
-                Confirmer
-              </button>
-              <button class="btn btn-secondary" onclick="closeConfirmModal()">
-                Annuler
+          <!-- Joueuses Management -->
+          <div id="joueuses-management" class="management-content">
+            <div class="form-card">
+              <h3>Ajouter une joueuse</h3>
+              <div class="form-group">
+                <label for="playerName">Nom de la joueuse :</label>
+                <input
+                  type="text"
+                  id="playerName"
+                  placeholder="Nom de la joueuse"
+                />
+              </div>
+              <button class="btn" onclick="addPlayer()">
+                Ajouter la joueuse
               </button>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <div id="successModal" class="modal" style="display: none">
-        <div class="modal-content success-modal">
-          <div class="modal-header">
-            <h3 id="successTitle">Succès</h3>
-            <span class="close" onclick="closeSuccessModal()">&times;</span>
-          </div>
-          <div class="modal-body">
-            <div class="success-content">
-              <div class="success-icon" id="successIcon">✅</div>
-              <p id="successMessage">Opération réussie !</p>
-            </div>
-            <div class="success-actions">
-              <button class="btn" onclick="closeSuccessModal()">Fermer</button>
+            <div class="list-card">
+              <h3>Joueuses existantes</h3>
+              <div class="action-buttons">
+                <button class="btn btn-danger" onclick="resetPlayers()">
+                  🗑️ Reset joueuses
+                </button>
+              </div>
+              <div id="playersList" class="player-list"></div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div id="errorModal" class="modal" style="display: none">
-        <div class="modal-content error-modal">
-          <div class="modal-header">
-            <h3 id="errorTitle">Erreur</h3>
-            <span class="close" onclick="closeErrorModal()">&times;</span>
+        <!-- Séances Section -->
+        <div id="seances" class="content-section">
+          <div class="section-header">
+            <h3>📋 Séances</h3>
           </div>
-          <div class="modal-body">
-            <div class="error-content">
-              <div class="error-icon" id="errorIcon">❌</div>
-              <p id="errorMessage">Une erreur s'est produite.</p>
+
+          <div class="seances-tabs">
+            <button
+              class="seances-tab active"
+              onclick="showSeancesTab('mes-seances')"
+            >
+              Mes séances
+            </button>
+            <button
+              class="seances-tab"
+              onclick="showSeancesTab('creer-seance')"
+            >
+              Créer une séance
+            </button>
+          </div>
+
+          <!-- Mes Séances -->
+          <div id="mes-seances" class="seances-content active">
+            <div class="seances-list" id="seancesList">
+              <!-- Les séances seront affichées ici -->
             </div>
-            <div class="error-actions">
-              <button class="btn" onclick="closeErrorModal()">Fermer</button>
-            </div>
           </div>
-        </div>
-      </div>
 
-      <div class="tabs">
-        <button class="tab active" onclick="showTab('exercises')">
-          Exercices
-        </button>
-        <button class="tab" onclick="showTab('players')">Joueuses</button>
-        <button class="tab" onclick="showTab('performances')">
-          Performances
-        </button>
-        <button class="tab" onclick="showTab('stats')">Statistiques</button>
-      </div>
+          <!-- Créer une séance -->
+          <div id="creer-seance" class="seances-content">
+            <div class="form-card">
+              <h3>Créer une nouvelle séance</h3>
 
-      <div id="exercises" class="tab-content active">
-        <h2>Gestion des Types d'Exercices</h2>
+              <div class="form-group">
+                <label for="sessionName">Nom de la séance :</label>
+                <input
+                  type="text"
+                  id="sessionName"
+                  placeholder="Ex: Test de saut"
+                />
+              </div>
 
-        <div
-          style="
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
-          "
-        >
-          <div class="form-group">
-            <label for="exerciseName">Nom de l'exercice :</label>
-            <input
-              type="text"
-              id="exerciseName"
-              placeholder="Ex: Sprint 50m, Saut en longueur..."
-            />
-          </div>
-          <div class="form-group">
-            <label for="exerciseUnit">Unité de mesure :</label>
-            <select id="exerciseUnit">
-              <option value="secondes">Secondes (temps)</option>
-              <option value="mètres">Mètres (distance)</option>
-              <option value="centimètres">Centimètres (distance)</option>
-              <option value="points">Points (score)</option>
-              <option value="répétitions">Répétitions</option>
-            </select>
-          </div>
-        </div>
+              <div class="form-group">
+                <label for="sessionDate">Date de la séance :</label>
+                <input type="date" id="sessionDate" />
+              </div>
 
-        <div class="form-group">
-          <label for="exerciseDescription">Description (optionnel) :</label>
-          <textarea
-            id="exerciseDescription"
-            rows="3"
-            placeholder="Description de l'exercice, consignes..."
-          ></textarea>
-        </div>
+              <div class="form-group">
+                <label>Sélectionner les exercices :</label>
+                <div id="exercisesSelection" class="exercises-selection">
+                  <!-- Les exercices seront affichés ici -->
+                </div>
+              </div>
 
-        <div class="form-group">
-          <label>Type de performance :</label>
-          <div class="radio-group">
-            <label class="radio-option">
-              <input
-                type="radio"
-                name="exerciseType"
-                value="time_fast"
-                checked
-              />
-              Temps le plus rapide
-            </label>
-
-            <label class="radio-option">
-              <input type="radio" name="exerciseType" value="time_slow" />
-              Temps le plus long
-            </label>
-
-            <label class="radio-option">
-              <input type="radio" name="exerciseType" value="distance_short" />
-              Distance la plus courte
-            </label>
-
-            <label class="radio-option">
-              <input type="radio" name="exerciseType" value="distance_long" />
-              Distance la plus lointaine
-            </label>
-          </div>
-        </div>
-
-        <div class="action-buttons">
-          <button class="btn" onclick="addExercise()">Créer l'exercice</button>
-          <button class="btn btn-danger" onclick="resetExercises()">
-            🗑️ Reset exercices
-          </button>
-        </div>
-
-        <div id="exercisesList" class="exercise-list"></div>
-      </div>
-
-      <div id="players" class="tab-content">
-        <h2>Gestion des Joueuses</h2>
-
-        <div class="form-group">
-          <label for="playerName">Nom de la joueuse :</label>
-          <input
-            type="text"
-            id="playerName"
-            placeholder="Entrez le nom de la joueuse"
-          />
-        </div>
-        <div class="action-buttons">
-          <button class="btn" onclick="addPlayer()">Ajouter une joueuse</button>
-          <button class="btn btn-danger" onclick="resetPlayers()">
-            🗑️ Reset joueuses
-          </button>
-        </div>
-
-        <div id="playersList" class="player-list"></div>
-      </div>
-
-      <div id="performances" class="tab-content">
-        <h2>Enregistrer des Performances</h2>
-
-        <div class="exercise-selector">
-          <div class="form-group">
-            <label for="perfExercise">Choisir l'exercice :</label>
-            <select id="perfExercise" onchange="updatePerformanceInterface()">
-              <option value="">Sélectionnez un exercice</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="perfPlayer">Choisir la joueuse :</label>
-            <select id="perfPlayer" onchange="updatePerformanceInterface()">
-              <option value="">Sélectionnez une joueuse</option>
-            </select>
-          </div>
-        </div>
-
-        <div id="performanceInterface" style="display: none">
-          <div class="performance-section">
-            <h3 id="performanceTitle">Nouvelle session</h3>
-            <p id="performanceDescription"></p>
-
-            <div class="series-config">
               <div class="form-group">
                 <label for="seriesCount">Nombre de séries :</label>
                 <input
@@ -284,71 +250,191 @@
                   min="1"
                   max="10"
                   value="1"
-                  onchange="updateAttemptsGrid()"
                 />
               </div>
-              <div class="form-group">
-                <label for="repetitionsCount"
-                  >Nombre de répétitions par série :</label
-                >
-                <input
-                  type="number"
-                  id="repetitionsCount"
-                  min="1"
-                  max="10"
-                  value="5"
-                  onchange="updateAttemptsGrid()"
-                />
-              </div>
-            </div>
 
-            <div id="attemptsSection">
-              <label>Saisir les performances :</label>
-              <div id="seriesContainer"></div>
-              <div class="action-buttons">
-                <button class="btn" onclick="savePerformance()">
-                  Enregistrer la performance
-                </button>
-                <button class="btn btn-danger" onclick="resetPerformances()">
-                  🗑️ Reset performances
-                </button>
-              </div>
+              <button class="btn" onclick="createSession()">
+                Créer la séance
+              </button>
             </div>
           </div>
         </div>
 
-        <div
-          id="currentPlayerStats"
-          class="performance-section"
-          style="display: none"
-        ></div>
+        <!-- Analyses Section -->
+        <div id="analyses" class="content-section">
+          <div class="section-header">
+            <h3>📊 Analyses</h3>
+          </div>
+
+          <div class="stats-selectors">
+            <div class="form-group">
+              <label for="statsExercise">Exercice :</label>
+              <select id="statsExercise" onchange="updateStatsInterface()">
+                <option value="">Sélectionnez un exercice</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="statsPlayer">Joueuse :</label>
+              <select id="statsPlayer" onchange="updateStatsInterface()">
+                <option value="">Toutes les joueuses</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="statsContent" class="stats-content">
+            <div class="no-data">
+              <h3>
+                📊 Sélectionnez un exercice ou une joueuse pour voir les
+                statistiques
+              </h3>
+              <p>
+                Les graphiques d'évolution et de comparaison s'afficheront ici
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Outils Section -->
+        <div id="outils" class="content-section">
+          <div class="section-header">
+            <h3>🛠️ Outils</h3>
+          </div>
+
+          <div class="tools-grid">
+            <div class="tool-card">
+              <h3>📤 Export</h3>
+              <p>Exportez toutes vos données vers Excel</p>
+              <button class="btn" onclick="exportToExcel()">
+                📤 Exporter vers Excel
+              </button>
+            </div>
+
+            <div class="tool-card">
+              <h3>📥 Import</h3>
+              <p>Importez des données depuis un fichier Excel</p>
+              <button class="btn" onclick="importFromExcel()">
+                📥 Importer depuis Excel
+              </button>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button class="btn btn-danger" onclick="resetAllData()">
+              🔄 Recommencer la séance
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Session Interface (hidden by default) -->
+    <div id="sessionInterface" class="session-interface" style="display: none">
+      <div class="session-header">
+        <h2 id="sessionTitle">Séance en cours</h2>
+        <button class="btn btn-secondary" onclick="closeSession()">
+          ← Retour au dashboard
+        </button>
       </div>
 
-      <div id="stats" class="tab-content">
-        <h2>Statistiques et Analyses</h2>
-
-        <div class="exercise-selector">
-          <div class="form-group">
-            <label for="statsExercise">Exercice :</label>
-            <select id="statsExercise" onchange="updateStatsInterface()">
-              <option value="">Sélectionnez un exercice</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="statsPlayer">Joueuse (optionnel) :</label>
-            <select id="statsPlayer" onchange="updateStatsInterface()">
-              <option value="">Toutes les joueuses</option>
-            </select>
+      <div class="session-config">
+        <div class="form-group">
+          <label>Sélectionner les joueuses :</label>
+          <div id="playersSelection" class="players-selection">
+            <!-- Les joueuses seront affichées ici -->
           </div>
         </div>
+      </div>
 
-        <div id="statsContent">
-          <div class="no-data">
-            <h3>📊 Sélectionnez un exercice pour voir les statistiques</h3>
-            <p>
-              Les graphiques d'évolution et de comparaison s'afficheront ici
-            </p>
+      <div class="session-tabs" id="sessionTabs">
+        <!-- Les onglets des joueuses seront générés ici -->
+      </div>
+
+      <div class="session-content" id="sessionContent">
+        <!-- Le contenu de la session sera affiché ici -->
+      </div>
+    </div>
+
+    <!-- Import Modal -->
+    <div id="importModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>📥 Importer des données Excel</h3>
+          <span class="close" onclick="closeImportModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="file-upload-section">
+            <input
+              type="file"
+              id="excelFile"
+              accept=".xlsx,.xls"
+              onchange="previewExcelFile()"
+            />
+            <div class="file-info">
+              Sélectionnez un fichier Excel (.xlsx ou .xls)
+            </div>
           </div>
+
+          <div id="importPreview" style="display: none">
+            <div id="previewContent"></div>
+
+            <div id="conflictsSection" style="display: none">
+              <h4>⚠️ Conflits détectés</h4>
+              <div id="conflictsList"></div>
+            </div>
+
+            <div class="import-actions">
+              <button class="btn" onclick="confirmImport()">
+                ✅ Confirmer l'import
+              </button>
+              <button class="btn btn-secondary" onclick="closeImportModal()">
+                ❌ Annuler
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Custom Modals -->
+    <div id="confirmModal" class="modal confirm-modal">
+      <div class="confirm-content">
+        <div class="confirm-icon" id="confirmIcon">⚠️</div>
+        <h3 id="confirmTitle">Confirmation</h3>
+        <p id="confirmMessage">Êtes-vous sûr ?</p>
+        <div class="confirm-actions">
+          <button
+            class="btn"
+            id="confirmActionBtn"
+            onclick="executeConfirmAction()"
+          >
+            Confirmer
+          </button>
+          <button class="btn btn-secondary" onclick="closeConfirmModal()">
+            Annuler
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="successModal" class="modal success-modal">
+      <div class="success-content">
+        <div class="success-icon" id="successIcon">✅</div>
+        <h3 id="successTitle">Succès</h3>
+        <p id="successMessage">Opération réussie</p>
+        <div class="success-actions">
+          <button class="btn" onclick="closeSuccessModal()">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="errorModal" class="modal error-modal">
+      <div class="error-content">
+        <div class="error-icon" id="errorIcon">❌</div>
+        <h3 id="errorTitle">Erreur</h3>
+        <p id="errorMessage">Une erreur s'est produite</p>
+        <div class="error-actions">
+          <button class="btn" onclick="closeErrorModal()">OK</button>
         </div>
       </div>
     </div>

@@ -1,24 +1,33 @@
 let players = JSON.parse(localStorage.getItem("players")) || [];
 let performances = JSON.parse(localStorage.getItem("performances")) || [];
+let sessions = JSON.parse(localStorage.getItem("sessions")) || [];
 
 let importData = null;
 let conflicts = [];
+let currentSession = null;
 
 document.addEventListener("DOMContentLoaded", function () {
   loadData();
   updateInterface();
+
+  const modals = document.querySelectorAll(".modal");
+  modals.forEach((modal) => {
+    modal.style.display = "none";
+  });
 });
 
 function saveData() {
   localStorage.setItem("exercises", JSON.stringify(exercises));
   localStorage.setItem("players", JSON.stringify(players));
   localStorage.setItem("performances", JSON.stringify(performances));
+  localStorage.setItem("sessions", JSON.stringify(sessions));
 }
 
 function loadData() {
   exercises = JSON.parse(localStorage.getItem("exercises")) || [];
   players = JSON.parse(localStorage.getItem("players")) || [];
   performances = JSON.parse(localStorage.getItem("performances")) || [];
+  sessions = JSON.parse(localStorage.getItem("sessions")) || [];
 }
 
 function updateInterface() {
@@ -26,6 +35,8 @@ function updateInterface() {
   updatePlayersList();
   updateExerciseSelectors();
   updatePlayerSelectors();
+  updateSessionsList();
+  updateExercisesSelection();
 }
 
 function showTab(tabName) {
@@ -1725,3 +1736,402 @@ window.onclick = function (event) {
     }
   });
 };
+
+// ===== DASHBOARD FUNCTIONS =====
+
+function showSection(sectionName) {
+  const sections = document.querySelectorAll(".content-section");
+  sections.forEach((section) => section.classList.remove("active"));
+
+  const navItems = document.querySelectorAll(".nav-item");
+  navItems.forEach((item) => item.classList.remove("active"));
+
+  document.getElementById(sectionName).classList.add("active");
+  event.target.classList.add("active");
+}
+
+function showManagementTab(tabName) {
+  const tabs = document.querySelectorAll(".management-content");
+  tabs.forEach((tab) => tab.classList.remove("active"));
+
+  const tabButtons = document.querySelectorAll(".management-tab");
+  tabButtons.forEach((btn) => btn.classList.remove("active"));
+
+  document.getElementById(tabName + "-management").classList.add("active");
+  event.target.classList.add("active");
+}
+
+function showSeancesTab(tabName) {
+  const tabs = document.querySelectorAll(".seances-content");
+  tabs.forEach((tab) => tab.classList.remove("active"));
+
+  const tabButtons = document.querySelectorAll(".seances-tab");
+  tabButtons.forEach((btn) => btn.classList.remove("active"));
+
+  document.getElementById(tabName).classList.add("active");
+  event.target.classList.add("active");
+}
+
+function updateSessionsList() {
+  const container = document.getElementById("seancesList");
+  if (!container) return;
+
+  if (sessions.length === 0) {
+    container.innerHTML = `
+      <div class="no-data">
+        <h3>📋 Aucune séance créée</h3>
+        <p>Créez votre première séance pour commencer</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = sessions
+    .map(
+      (session) => `
+    <div class="session-card">
+      <div class="session-header">
+        <h3>${session.name}</h3>
+        <span class="session-date">${new Date(session.date).toLocaleDateString(
+          "fr-FR"
+        )}</span>
+      </div>
+      <div class="session-details">
+        <p><strong>Exercices :</strong> ${session.exercises.length}</p>
+        <p><strong>Séries :</strong> ${session.seriesCount}</p>
+      </div>
+      <div class="session-actions">
+        <button class="btn" onclick="startSession('${
+          session.id
+        }')">▶️ Démarrer</button>
+        <button class="btn btn-danger" onclick="deleteSession('${
+          session.id
+        }')">🗑️ Supprimer</button>
+      </div>
+    </div>
+  `
+    )
+    .join("");
+}
+
+function updateExercisesSelection() {
+  const container = document.getElementById("exercisesSelection");
+  if (!container) return;
+
+  if (exercises.length === 0) {
+    container.innerHTML = `
+      <div class="no-data">
+        <p>Aucun exercice créé. Créez d'abord des exercices.</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = exercises
+    .map(
+      (exercise) => `
+    <div class="exercise-selection-item" onclick="toggleExerciseSelection('${
+      exercise.id
+    }')" id="exercise-${exercise.id}">
+      <h4>${exercise.name}</h4>
+      <p>${exercise.description || "Aucune description"}</p>
+      <p><strong>Unité :</strong> ${exercise.unit}</p>
+      <div class="exercise-repetitions">
+        <label>Répétitions :</label>
+        <input type="number" min="1" max="20" value="5" onchange="updateExerciseRepetitions('${
+          exercise.id
+        }', this.value)" onclick="event.stopPropagation()">
+      </div>
+    </div>
+  `
+    )
+    .join("");
+}
+
+function toggleExerciseSelection(exerciseId) {
+  const item = document.getElementById(`exercise-${exerciseId}`);
+  item.classList.toggle("selected");
+}
+
+function updateExerciseRepetitions(exerciseId, repetitions) {
+  const exercise = exercises.find((e) => e.id === exerciseId);
+  if (exercise) {
+    exercise.repetitions = parseInt(repetitions);
+  }
+}
+
+function createSession() {
+  const name = document.getElementById("sessionName").value.trim();
+  const date = document.getElementById("sessionDate").value;
+  const seriesCount =
+    parseInt(document.getElementById("seriesCount").value) || 1;
+
+  if (!name) {
+    showErrorModal("❌ Erreur", "Veuillez saisir un nom de séance", "❌");
+    return;
+  }
+
+  if (!date) {
+    showErrorModal("❌ Erreur", "Veuillez sélectionner une date", "❌");
+    return;
+  }
+
+  const selectedExercises = [];
+  exercises.forEach((exercise) => {
+    const item = document.getElementById(`exercise-${exercise.id}`);
+    if (item && item.classList.contains("selected")) {
+      selectedExercises.push({
+        id: exercise.id,
+        name: exercise.name,
+        unit: exercise.unit,
+        type: exercise.type,
+        repetitions: exercise.repetitions || 5,
+      });
+    }
+  });
+
+  if (selectedExercises.length === 0) {
+    showErrorModal(
+      "❌ Erreur",
+      "Veuillez sélectionner au moins un exercice",
+      "❌"
+    );
+    return;
+  }
+
+  const session = {
+    id: Date.now().toString(),
+    name: name,
+    date: date,
+    seriesCount: seriesCount,
+    exercises: selectedExercises,
+    createdAt: new Date().toISOString(),
+  };
+
+  sessions.push(session);
+  saveData();
+  updateInterface();
+
+  document.getElementById("sessionName").value = "";
+  document.getElementById("sessionDate").value = "";
+  document.getElementById("seriesCount").value = "1";
+
+  exercises.forEach((exercise) => {
+    const item = document.getElementById(`exercise-${exercise.id}`);
+    if (item) {
+      item.classList.remove("selected");
+    }
+  });
+
+  showSuccessModal("✅ Succès", "Séance créée avec succès !", "✅");
+}
+
+function deleteSession(sessionId) {
+  showConfirmModal(
+    "🗑️ Supprimer la séance",
+    "Êtes-vous sûr de vouloir supprimer cette séance ?",
+    "⚠️",
+    "delete",
+    function () {
+      sessions = sessions.filter((s) => s.id !== sessionId);
+      saveData();
+      updateInterface();
+      showSuccessModal("✅ Succès", "Séance supprimée avec succès !", "✅");
+    }
+  );
+}
+
+function startSession(sessionId) {
+  currentSession = sessions.find((s) => s.id === sessionId);
+  if (!currentSession) return;
+
+  document.getElementById("sessionTitle").textContent = currentSession.name;
+  document.getElementById("sessionInterface").style.display = "block";
+
+  updatePlayersSelection();
+  updateSessionTabs();
+}
+
+function closeSession() {
+  document.getElementById("sessionInterface").style.display = "none";
+  currentSession = null;
+}
+
+function updatePlayersSelection() {
+  const container = document.getElementById("playersSelection");
+  if (!container) return;
+
+  container.innerHTML = players
+    .map(
+      (player) => `
+    <div class="player-selection-item" onclick="togglePlayerSelection('${player.id}')" id="player-${player.id}">
+      ${player.name}
+    </div>
+  `
+    )
+    .join("");
+}
+
+function togglePlayerSelection(playerId) {
+  const item = document.getElementById(`player-${playerId}`);
+  item.classList.toggle("selected");
+  updateSessionTabs();
+}
+
+function updateSessionTabs() {
+  const container = document.getElementById("sessionTabs");
+  const contentContainer = document.getElementById("sessionContent");
+
+  if (!container || !contentContainer) return;
+
+  const selectedPlayers = players.filter((player) => {
+    const item = document.getElementById(`player-${player.id}`);
+    return item && item.classList.contains("selected");
+  });
+
+  if (selectedPlayers.length === 0) {
+    container.innerHTML = "";
+    contentContainer.innerHTML = `
+      <div class="no-data">
+        <h3>👥 Sélectionnez des joueuses</h3>
+        <p>Sélectionnez au moins une joueuse pour commencer la séance</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = selectedPlayers
+    .map(
+      (player, index) => `
+    <button class="session-tab ${
+      index === 0 ? "active" : ""
+    }" onclick="showPlayerSession('${player.id}')">
+      ${player.name}
+    </button>
+  `
+    )
+    .join("");
+
+  if (selectedPlayers.length > 0) {
+    showPlayerSession(selectedPlayers[0].id);
+  }
+}
+
+function showPlayerSession(playerId) {
+  const tabs = document.querySelectorAll(".session-tab");
+  tabs.forEach((tab) => tab.classList.remove("active"));
+  event.target.classList.add("active");
+
+  const player = players.find((p) => p.id === playerId);
+  if (!player || !currentSession) return;
+
+  const contentContainer = document.getElementById("sessionContent");
+  contentContainer.innerHTML = `
+    <div class="session-player-content">
+      <h3>${player.name} - ${currentSession.name}</h3>
+      <div class="session-exercises">
+        ${currentSession.exercises
+          .map(
+            (exercise, index) => `
+          <div class="session-exercise">
+            <h4>${index + 1}. ${exercise.name}</h4>
+            <p>Répétitions : ${exercise.repetitions}</p>
+            <div class="exercise-inputs">
+              ${generateExerciseInputs(exercise, playerId)}
+            </div>
+          </div>
+        `
+          )
+          .join("")}
+      </div>
+      <div class="session-actions">
+        <button class="btn" onclick="saveSessionPerformance('${playerId}')">💾 Sauvegarder</button>
+        <button class="btn btn-secondary" onclick="resetSessionForm()">🔄 Reset</button>
+      </div>
+    </div>
+  `;
+}
+
+function generateExerciseInputs(exercise, playerId) {
+  let inputs = "";
+  for (let rep = 1; rep <= exercise.repetitions; rep++) {
+    inputs += `
+      <div class="input-group">
+        <label>Rép. ${rep}:</label>
+        <input type="number" step="0.01" id="perf-${playerId}-${exercise.id}-${rep}" placeholder="${exercise.unit}">
+      </div>
+    `;
+  }
+  return inputs;
+}
+
+function saveSessionPerformance(playerId) {
+  if (!currentSession) return;
+
+  const player = players.find((p) => p.id === playerId);
+  if (!player) return;
+
+  const allPerformances = [];
+
+  currentSession.exercises.forEach((exercise) => {
+    const attempts = [];
+    for (let rep = 1; rep <= exercise.repetitions; rep++) {
+      const input = document.getElementById(
+        `perf-${playerId}-${exercise.id}-${rep}`
+      );
+      if (input && input.value) {
+        attempts.push(parseFloat(input.value));
+      }
+    }
+
+    if (attempts.length > 0) {
+      const exerciseData = exercises.find((e) => e.id === exercise.id);
+      let bestScore;
+
+      if (
+        exerciseData.type.includes("time") ||
+        exerciseData.type.includes("distance_short")
+      ) {
+        bestScore = Math.min(...attempts);
+      } else {
+        bestScore = Math.max(...attempts);
+      }
+
+      const performance = {
+        id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+        date: currentSession.date,
+        playerId: playerId,
+        exerciseId: exercise.id,
+        attempts: attempts,
+        bestScore: bestScore,
+        sessionId: currentSession.id,
+      };
+
+      allPerformances.push(performance);
+    }
+  });
+
+  if (allPerformances.length === 0) {
+    showErrorModal(
+      "❌ Erreur",
+      "Veuillez saisir au moins une performance",
+      "❌"
+    );
+    return;
+  }
+
+  performances.push(...allPerformances);
+  saveData();
+
+  showSuccessModal(
+    "✅ Succès",
+    "Performances enregistrées avec succès !",
+    "✅"
+  );
+  resetSessionForm();
+}
+
+function resetSessionForm() {
+  const inputs = document.querySelectorAll(".session-exercise input");
+  inputs.forEach((input) => (input.value = ""));
+}
