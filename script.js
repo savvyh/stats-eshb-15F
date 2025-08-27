@@ -37,6 +37,7 @@ function updateInterface() {
   updatePlayerSelectors();
   updateSessionsList();
   updateExercisesSelection();
+  initializePerformanceTypeSelector();
 }
 
 function showTab(tabName) {
@@ -56,12 +57,30 @@ function addExercise() {
   const description = document
     .getElementById("exerciseDescription")
     .value.trim();
-  const type = document.querySelector(
-    'input[name="exerciseType"]:checked'
-  ).value;
+  const selectedOption = document.querySelector(".performance-option.selected");
+
+  if (!selectedOption) {
+    showErrorModal(
+      "❌ Erreur",
+      "Veuillez sélectionner un type de performance",
+      "❌"
+    );
+    return;
+  }
+
+  const type = selectedOption.dataset.value;
 
   if (!name) {
     showErrorModal("❌ Erreur", "Veuillez saisir un nom d'exercice", "❌");
+    return;
+  }
+
+  if (!unit) {
+    showErrorModal(
+      "❌ Erreur",
+      "Veuillez sélectionner une unité de mesure",
+      "❌"
+    );
     return;
   }
 
@@ -79,10 +98,16 @@ function addExercise() {
   updateInterface();
 
   document.getElementById("exerciseName").value = "";
+  document.getElementById("exerciseUnit").value = "";
   document.getElementById("exerciseDescription").value = "";
-  document.querySelector(
-    'input[name="exerciseType"][value="time_fast"]'
-  ).checked = true;
+
+  const options = document.querySelectorAll(".performance-option");
+  options.forEach((option) => option.classList.remove("selected"));
+  document
+    .querySelector('.performance-option[data-value="time_fast"]')
+    .classList.add("selected");
+
+  showSuccessModal("✅ Succès", "Exercice ajouté avec succès !", "✅");
 }
 
 function updateExercisesList() {
@@ -162,22 +187,13 @@ function updatePlayersList() {
   container.innerHTML = "";
 
   players.forEach((player) => {
-    const performanceCount = performances.filter(
-      (p) => p.playerId === player.id
-    ).length;
     const card = document.createElement("div");
     card.className = "player-card";
     card.innerHTML = `
             <div class="player-name">${player.name}</div>
-            <div class="exercise-details">
-                <strong>Date de la séance :</strong> ${new Date(
-                  player.registeredAt
-                ).toLocaleDateString("fr-FR")}<br>
-                <strong>Performances :</strong> ${performanceCount}
-            </div>
-            <button class="btn btn-danger" onclick="deletePlayer('${
-              player.id
-            }')">Supprimer</button>
+            <button class="btn-delete" onclick="deletePlayer('${player.id}')" title="Supprimer ${player.name}">
+              ✕
+            </button>
         `;
     container.appendChild(card);
   });
@@ -2134,4 +2150,19 @@ function saveSessionPerformance(playerId) {
 function resetSessionForm() {
   const inputs = document.querySelectorAll(".session-exercise input");
   inputs.forEach((input) => (input.value = ""));
+}
+
+function initializePerformanceTypeSelector() {
+  const options = document.querySelectorAll(".performance-option");
+
+  options.forEach((option) => {
+    option.addEventListener("click", function () {
+      options.forEach((opt) => opt.classList.remove("selected"));
+      this.classList.add("selected");
+    });
+  });
+
+  if (options.length > 0) {
+    options[0].classList.add("selected");
+  }
 }

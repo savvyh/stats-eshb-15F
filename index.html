@@ -72,64 +72,54 @@
           <div id="exercices-management" class="management-content active">
             <div class="form-card">
               <h3>Ajouter un exercice</h3>
-              <div class="form-group">
-                <label for="exerciseName">Nom de l'exercice :</label>
-                <input
-                  type="text"
-                  id="exerciseName"
-                  placeholder="Ex: Sprint 20m"
-                />
-              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="exerciseName">Nom de l'exercice :</label>
+                  <input
+                    type="text"
+                    id="exerciseName"
+                    placeholder="Ex: Sprint 20m"
+                  />
+                </div>
 
-              <div class="form-group">
-                <label for="exerciseUnit">Unité de mesure :</label>
-                <input
-                  type="text"
-                  id="exerciseUnit"
-                  placeholder="Ex: secondes, mètres, kg"
-                />
+                <div class="form-group">
+                  <label for="exerciseUnit">Unité de mesure :</label>
+                  <select id="exerciseUnit">
+                    <option value="">Sélectionner une unité</option>
+                    <option value="secondes">Secondes</option>
+                    <option value="minutes">Minutes</option>
+                    <option value="centimètres">Centimètres</option>
+                    <option value="mètres">Mètres</option>
+                    <option value="kg">Kg</option>
+                    <option value="palier">Palier</option>
+                    <option value="répétitions">Répétitions</option>
+                  </select>
+                </div>
               </div>
 
               <div class="form-group">
                 <label>Type de performance :</label>
-                <div class="radio-group">
-                  <label class="radio-option">
-                    <input
-                      type="radio"
-                      name="exerciseType"
-                      value="time_fast"
-                      checked
-                    />
-                    <span>Temps le plus rapide</span>
-                  </label>
-                  <label class="radio-option">
-                    <input type="radio" name="exerciseType" value="time_slow" />
-                    <span>Temps le plus long</span>
-                  </label>
-                  <label class="radio-option">
-                    <input
-                      type="radio"
-                      name="exerciseType"
-                      value="distance_short"
-                    />
-                    <span>Distance la plus courte</span>
-                  </label>
-                  <label class="radio-option">
-                    <input
-                      type="radio"
-                      name="exerciseType"
-                      value="distance_long"
-                    />
-                    <span>Distance la plus lointaine</span>
-                  </label>
-                  <label class="radio-option">
-                    <input
-                      type="radio"
-                      name="exerciseType"
-                      value="height_highest"
-                    />
-                    <span>Palier le plus haut</span>
-                  </label>
+                <div class="performance-type-selector">
+                  <div class="performance-option" data-value="time_fast">
+                    <span class="option-icon">⚡</span>
+                    <span class="option-text">Temps le plus rapide</span>
+                  </div>
+                  <div class="performance-option" data-value="time_slow">
+                    <span class="option-icon">⏱️</span>
+                    <span class="option-text">Temps le plus long</span>
+                  </div>
+                  <div class="performance-option" data-value="distance_short">
+                    <span class="option-icon">📏</span>
+                    <span class="option-text">Distance la plus courte</span>
+                  </div>
+                  <div class="performance-option" data-value="distance_long">
+                    <span class="option-icon">🏃</span>
+                    <span class="option-text">Distance la plus lointaine</span>
+                  </div>
+                  <div class="performance-option" data-value="height_highest">
+                    <span class="option-icon">📈</span>
+                    <span class="option-text">Palier le plus haut</span>
+                  </div>
                 </div>
               </div>
 
@@ -149,10 +139,10 @@
             </div>
 
             <div class="list-card">
-              <h3>Exercices existants</h3>
-              <div class="action-buttons">
+              <div class="list-header">
+                <h3>Exercices existants</h3>
                 <button class="btn btn-danger" onclick="resetExercises()">
-                  🗑️ Reset exercices
+                  🗑️ Tout supprimer
                 </button>
               </div>
               <div id="exercisesList" class="exercise-list"></div>
@@ -177,10 +167,10 @@
             </div>
 
             <div class="list-card">
-              <h3>Joueuses existantes</h3>
-              <div class="action-buttons">
+              <div class="list-header">
+                <h3>Joueuses existantes</h3>
                 <button class="btn btn-danger" onclick="resetPlayers()">
-                  🗑️ Reset joueuses
+                  🗑️ Tout supprimer
                 </button>
               </div>
               <div id="playersList" class="player-list"></div>
