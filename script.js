@@ -118,7 +118,14 @@ function updateExercisesList() {
     const card = document.createElement("div");
     card.className = "exercise-card";
     card.innerHTML = `
-            <div class="exercise-name">${exercise.name}</div>
+            <div class="exercise-header">
+              <div class="exercise-name">${exercise.name}</div>
+              <button class="btn-delete" onclick="deleteExercise('${
+                exercise.id
+              }')" title="Supprimer ${exercise.name}">
+                ✕
+              </button>
+            </div>
             <div class="exercise-unit">${exercise.unit}</div>
             <div class="exercise-details">
                 <strong>Type:</strong> ${getExerciseTypeLabel(
@@ -128,9 +135,6 @@ function updateExercisesList() {
                   exercise.description || "Aucune description"
                 }
             </div>
-            <button class="btn btn-danger" onclick="deleteExercise('${
-              exercise.id
-            }')">Supprimer</button>
         `;
     container.appendChild(card);
   });

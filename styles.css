@@ -374,7 +374,7 @@ textarea {
   border-radius: 4px;
 }
 
-/* Delete Button for Players */
+/* Delete Button for Players and Exercises */
 .btn-delete {
   position: relative;
   width: 18px;
@@ -413,10 +413,15 @@ textarea {
   background: #ffffff;
   border-radius: 8px;
   padding: 16px;
-  padding-bottom: 48px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border: 1px solid #e2e8f0;
   position: relative;
+}
+
+.exercise-card {
+  padding: 12px;
+  min-width: 200px;
+  max-width: 300px;
 }
 
 .player-card {
@@ -439,6 +444,22 @@ textarea {
   line-height: 1.3;
 }
 
+.exercise-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  gap: 12px;
+}
+
+.exercise-header .exercise-name {
+  margin-bottom: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .player-card .player-name {
   margin-bottom: 0;
   overflow: hidden;
@@ -448,11 +469,11 @@ textarea {
 
 .exercise-details {
   background: #f8fafc;
-  padding: 12px;
+  padding: 10px;
   border-radius: 6px;
-  margin: 12px 0;
+  margin: 8px 0;
   border: 1px solid #e2e8f0;
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.4;
 }
 
@@ -465,11 +486,11 @@ textarea {
   display: inline-block;
   background: #4299e1;
   color: white;
-  padding: 3px 10px;
-  border-radius: 12px;
-  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
