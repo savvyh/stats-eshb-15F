@@ -27,9 +27,9 @@
             <span class="nav-text">Séances</span>
           </button>
 
-          <button class="nav-item" onclick="showSection('analyses')">
+          <button class="nav-item" onclick="showSection('performances')">
             <span class="nav-icon">📊</span>
-            <span class="nav-text">Analyses</span>
+            <span class="nav-text">Performances</span>
           </button>
 
           <button class="nav-item" onclick="showSection('outils')">
@@ -39,8 +39,9 @@
         </nav>
 
         <div class="sidebar-footer">
-          <button class="btn btn-danger" onclick="finishTraining()">
-            🏁 Fin d'entraînement
+          <button class="finish-training-btn" onclick="finishTraining()">
+            <span class="finish-icon">🏁</span>
+            <span class="finish-text">Fin d'entraînement</span>
           </button>
         </div>
       </div>
@@ -141,8 +142,9 @@
             <div class="list-card">
               <div class="list-header">
                 <h3>Exercices existants</h3>
-                <button class="btn btn-danger" onclick="resetExercises()">
-                  🗑️ Tout supprimer
+                <button class="delete-all-btn" onclick="resetExercises()">
+                  <span class="delete-icon">🗑️</span>
+                  <span class="delete-text">Tout supprimer</span>
                 </button>
               </div>
               <div id="exercisesList" class="exercise-list"></div>
@@ -169,8 +171,9 @@
             <div class="list-card">
               <div class="list-header">
                 <h3>Joueuses existantes</h3>
-                <button class="btn btn-danger" onclick="resetPlayers()">
-                  🗑️ Tout supprimer
+                <button class="delete-all-btn" onclick="resetPlayers()">
+                  <span class="delete-icon">🗑️</span>
+                  <span class="delete-text">Tout supprimer</span>
                 </button>
               </div>
               <div id="playersList" class="player-list"></div>
@@ -227,9 +230,7 @@
 
               <div class="form-group">
                 <label>Sélectionner les exercices :</label>
-                <div id="exercisesSelection" class="exercises-selection">
-                  <!-- Les exercices seront affichés ici -->
-                </div>
+                <div id="exercisesSelection" class="exercises-selection"></div>
               </div>
 
               <div class="form-group">
@@ -243,17 +244,28 @@
                 />
               </div>
 
-              <button class="btn" onclick="createSession()">
+              <button
+                class="btn"
+                id="createSessionBtn"
+                onclick="createSession()"
+              >
                 Créer la séance
+              </button>
+              <button
+                class="btn btn-danger"
+                id="cancelEditBtn"
+                onclick="cancelEdit()"
+                style="display: none"
+              >
+                ❌ Annuler la modification
               </button>
             </div>
           </div>
         </div>
 
-        <!-- Analyses Section -->
-        <div id="analyses" class="content-section">
+        <div id="performances" class="content-section">
           <div class="section-header">
-            <h3>📊 Analyses</h3>
+            <h3>📊 Analyses des performances</h3>
           </div>
 
           <div class="stats-selectors">
@@ -336,16 +348,11 @@
         </div>
       </div>
 
-      <div class="session-tabs" id="sessionTabs">
-        <!-- Les onglets des joueuses seront générés ici -->
-      </div>
+      <div class="session-tabs" id="sessionTabs"></div>
 
-      <div class="session-content" id="sessionContent">
-        <!-- Le contenu de la session sera affiché ici -->
-      </div>
+      <div class="session-content" id="sessionContent"></div>
     </div>
 
-    <!-- Import Modal -->
     <div id="importModal" class="modal">
       <div class="modal-content">
         <div class="modal-header">
@@ -374,10 +381,10 @@
             </div>
 
             <div class="import-actions">
-              <button class="btn" onclick="confirmImport()">
+              <button class="btn btn-success" onclick="confirmImport()">
                 ✅ Confirmer l'import
               </button>
-              <button class="btn btn-secondary" onclick="closeImportModal()">
+              <button class="btn btn-danger" onclick="closeImportModal()">
                 ❌ Annuler
               </button>
             </div>
@@ -389,18 +396,16 @@
     <!-- Custom Modals -->
     <div id="confirmModal" class="modal confirm-modal">
       <div class="confirm-content">
-        <div class="confirm-icon" id="confirmIcon">⚠️</div>
-        <h3 id="confirmTitle">Confirmation</h3>
-        <p id="confirmMessage">Êtes-vous sûr ?</p>
+        <p id="confirmMessage">Êtes-vous sûr ? ⚠️</p>
         <div class="confirm-actions">
           <button
-            class="btn"
+            class="btn btn-success"
             id="confirmActionBtn"
             onclick="executeConfirmAction()"
           >
             Confirmer
           </button>
-          <button class="btn btn-secondary" onclick="closeConfirmModal()">
+          <button class="btn btn-danger" onclick="closeConfirmModal()">
             Annuler
           </button>
         </div>
@@ -409,9 +414,7 @@
 
     <div id="successModal" class="modal success-modal">
       <div class="success-content">
-        <div class="success-icon" id="successIcon">✅</div>
-        <h3 id="successTitle">Succès</h3>
-        <p id="successMessage">Opération réussie</p>
+        <p id="successMessage">Opération réussie ✅</p>
         <div class="success-actions">
           <button class="btn" onclick="closeSuccessModal()">OK</button>
         </div>
@@ -420,9 +423,7 @@
 
     <div id="errorModal" class="modal error-modal">
       <div class="error-content">
-        <div class="error-icon" id="errorIcon">❌</div>
-        <h3 id="errorTitle">Erreur</h3>
-        <p id="errorMessage">Une erreur s'est produite</p>
+        <p id="errorMessage">Une erreur s'est produite ❌</p>
         <div class="error-actions">
           <button class="btn" onclick="closeErrorModal()">OK</button>
         </div>
