@@ -1899,7 +1899,7 @@ function updateExercisesSelection() {
       <div class="exercise-repetitions">
         <label>Répétitions :</label>
         <input type="number" min="1" max="20" value="${
-          exercise.repetitions || 5
+          exercise.repetitions || 3
         }" class="repetitions-input" onchange="updateExerciseRepetitions('${
         exercise.id
       }', this.value)" onclick="event.stopPropagation()">
@@ -1947,7 +1947,7 @@ function createSession() {
         name: exercise.name,
         unit: exercise.unit,
         type: exercise.type,
-        repetitions: exercise.repetitions || 5,
+        repetitions: exercise.repetitions || 3,
       });
     }
   });
@@ -2017,7 +2017,7 @@ function editSession(sessionId) {
     const item = document.getElementById(`exercise-${exercise.id}`);
     if (item) {
       item.classList.remove("selected");
-      exercise.repetitions = 5; // Reset à la valeur par défaut
+      exercise.repetitions = 3; // Reset à la valeur par défaut
     }
   });
 
@@ -2076,7 +2076,7 @@ function cancelEdit() {
     const item = document.getElementById(`exercise-${exercise.id}`);
     if (item) {
       item.classList.remove("selected");
-      exercise.repetitions = 5;
+      exercise.repetitions = 3;
     }
   });
 
@@ -2122,7 +2122,7 @@ function updateSession(sessionId) {
         name: exercise.name,
         unit: exercise.unit,
         type: exercise.type,
-        repetitions: exercise.repetitions || 5,
+        repetitions: exercise.repetitions || 3,
       });
     }
   });
