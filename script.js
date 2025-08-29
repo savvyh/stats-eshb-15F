@@ -119,7 +119,7 @@ function updateExercisesList() {
     card.className = "exercise-card";
     card.innerHTML = `
             <div class="exercise-header">
-              <div class="exercise-name">${exercise.name}</div>
+            <div class="exercise-name">${exercise.name}</div>
               <button class="btn-delete" onclick="deleteExercise('${
                 exercise.id
               }')" title="Supprimer ${exercise.name}">
@@ -146,6 +146,7 @@ function getExerciseTypeLabel(type) {
     time_slow: "Temps le plus long",
     distance_short: "Distance la plus courte",
     distance_long: "Distance la plus lointaine",
+    height_highest: "Palier le plus haut",
   };
   return types[type] || type;
 }
@@ -1565,7 +1566,7 @@ function createPerformanceChart(exerciseId, playerId) {
 function resetAllData() {
   showConfirmModal(
     "🔄 Recommencer la séance",
-    "⚠️ Êtes-vous sûr de vouloir recommencer la séance ?\n\nCette action supprimera TOUTES les données :\n- Tous les exercices\n- Toutes les joueuses\n- Toutes les performances\n\nCette action est irréversible !",
+    "Êtes-vous sûr de vouloir recommencer la séance ?\n\nCette action supprimera TOUTES les données :\n- Tous les exercices\n- Toutes les joueuses\n- Toutes les performances",
     "⚠️",
     "reset",
     function () {
@@ -1605,7 +1606,7 @@ function resetAllData() {
 function resetExercises() {
   showConfirmModal(
     "🗑️ Supprimer les exercices",
-    "⚠️ Êtes-vous sûr de vouloir supprimer TOUS les exercices ?\n\nCette action supprimera également toutes les performances associées.\n\nCette action est irréversible !",
+    "Êtes-vous sûr de vouloir supprimer TOUS les exercices ?\n\nCette action supprimera également toutes les performances associées.",
     "⚠️",
     "reset",
     function () {
@@ -1642,7 +1643,7 @@ function resetExercises() {
 function resetPlayers() {
   showConfirmModal(
     "🗑️ Supprimer les joueuses",
-    "⚠️ Êtes-vous sûr de vouloir supprimer TOUTES les joueuses ?\n\nCette action supprimera également toutes les performances associées.\n\nCette action est irréversible !",
+    "Êtes-vous sûr de vouloir supprimer TOUTES les joueuses ?\n\nCette action supprimera également toutes les performances associées.",
     "⚠️",
     "reset",
     function () {
@@ -1675,7 +1676,7 @@ function resetPlayers() {
 function resetPerformances() {
   showConfirmModal(
     "🗑️ Supprimer les performances",
-    "⚠️ Êtes-vous sûr de vouloir supprimer TOUTES les performances ?\n\nCette action est irréversible !",
+    "Êtes-vous sûr de vouloir supprimer TOUTES les performances ?",
     "⚠️",
     "reset",
     function () {
@@ -1705,9 +1706,7 @@ let confirmCallback = null;
 let confirmAction = null;
 
 function showConfirmModal(title, message, icon, action, callback) {
-  document.getElementById("confirmTitle").textContent = title;
-  document.getElementById("confirmMessage").textContent = message;
-  document.getElementById("confirmIcon").textContent = icon;
+  document.getElementById("confirmMessage").textContent = message + " " + icon;
   confirmAction = action;
   confirmCallback = callback;
   document.getElementById("confirmModal").style.display = "block";
@@ -1726,10 +1725,8 @@ function executeConfirmAction() {
   closeConfirmModal();
 }
 
-function showSuccessModal(title, message, icon = "✅") {
-  document.getElementById("successTitle").textContent = title;
-  document.getElementById("successMessage").textContent = message;
-  document.getElementById("successIcon").textContent = icon;
+function showSuccessModal(title, message) {
+  document.getElementById("successMessage").textContent = message + " ✅";
   document.getElementById("successModal").style.display = "block";
 }
 
@@ -1737,10 +1734,8 @@ function closeSuccessModal() {
   document.getElementById("successModal").style.display = "none";
 }
 
-function showErrorModal(title, message, icon = "❌") {
-  document.getElementById("errorTitle").textContent = title;
-  document.getElementById("errorMessage").textContent = message;
-  document.getElementById("errorIcon").textContent = icon;
+function showErrorModal(title, message) {
+  document.getElementById("errorMessage").textContent = message + " ❌";
   document.getElementById("errorModal").style.display = "block";
 }
 
@@ -1806,32 +1801,77 @@ function updateSessionsList() {
     return;
   }
 
-  container.innerHTML = sessions
-    .map(
-      (session) => `
-    <div class="session-card">
-      <div class="session-header">
-        <h3>${session.name}</h3>
-        <span class="session-date">${new Date(session.date).toLocaleDateString(
-          "fr-FR"
-        )}</span>
-      </div>
-      <div class="session-details">
-        <p><strong>Exercices :</strong> ${session.exercises.length}</p>
-        <p><strong>Séries :</strong> ${session.seriesCount}</p>
-      </div>
-      <div class="session-actions">
-        <button class="btn" onclick="startSession('${
-          session.id
-        }')">▶️ Démarrer</button>
-        <button class="btn btn-danger" onclick="deleteSession('${
-          session.id
-        }')">🗑️ Supprimer</button>
-      </div>
+  container.innerHTML = `
+    <div class="sessions-grid">
+      ${sessions
+        .map(
+          (session) => `
+        <div class="session-card">
+          <div class="session-card-header">
+            <div class="session-info">
+              <h3 class="session-title">${session.name}</h3>
+              <div class="session-meta">
+                <span class="session-date">
+                  <span class="meta-icon">📅</span>
+                  ${new Date(session.date).toLocaleDateString("fr-FR")}
+                </span>
+                <span class="session-stats">
+                  <span class="meta-icon">🏃‍♀️</span>
+                  ${session.exercises.length} exercice${
+            session.exercises.length > 1 ? "s" : ""
+          }
+                </span>
+                <span class="session-stats">
+                  <span class="meta-icon">🔄</span>
+                  ${session.seriesCount} série${
+            session.seriesCount > 1 ? "s" : ""
+          }
+                </span>
+              </div>
+            </div>
+            <div class="session-actions">
+              <button class="btn-icon" onclick="editSession('${
+                session.id
+              }')" title="Modifier">
+                ✏️
+              </button>
+              <button class="btn-icon btn-danger" onclick="deleteSession('${
+                session.id
+              }')" title="Supprimer">
+                🗑️
+              </button>
+            </div>
+          </div>
+          
+          <div class="session-exercises-preview">
+            <h4>Exercices inclus :</h4>
+            <div class="exercises-tags">
+              ${session.exercises
+                .map(
+                  (exercise) => `
+                <span class="exercise-tag">
+                  <span class="tag-icon">⚡</span>
+                  ${exercise.name} (${exercise.repetitions} rép.)
+                </span>
+              `
+                )
+                .join("")}
+            </div>
+          </div>
+          
+          <div class="session-card-footer">
+            <button class="btn btn-primary" onclick="startSession('${
+              session.id
+            }')">
+              Démarrer la séance
+            </button>
+          </div>
+        </div>
+      `
+        )
+        .join("")}
     </div>
-  `
-    )
-    .join("");
+  `;
 }
 
 function updateExercisesSelection() {
@@ -1858,9 +1898,11 @@ function updateExercisesSelection() {
       <p><strong>Unité :</strong> ${exercise.unit}</p>
       <div class="exercise-repetitions">
         <label>Répétitions :</label>
-        <input type="number" min="1" max="20" value="5" onchange="updateExerciseRepetitions('${
-          exercise.id
-        }', this.value)" onclick="event.stopPropagation()">
+        <input type="number" min="1" max="20" value="${
+          exercise.repetitions || 5
+        }" class="repetitions-input" onchange="updateExerciseRepetitions('${
+        exercise.id
+      }', this.value)" onclick="event.stopPropagation()">
       </div>
     </div>
   `
@@ -1959,6 +2001,160 @@ function deleteSession(sessionId) {
       showSuccessModal("✅ Succès", "Séance supprimée avec succès !", "✅");
     }
   );
+}
+
+function editSession(sessionId) {
+  const session = sessions.find((s) => s.id === sessionId);
+  if (!session) return;
+
+  // Pré-remplir le formulaire avec les données de la séance
+  document.getElementById("sessionName").value = session.name;
+  document.getElementById("sessionDate").value = session.date;
+  document.getElementById("seriesCount").value = session.seriesCount;
+
+  // Réinitialiser la sélection des exercices
+  exercises.forEach((exercise) => {
+    const item = document.getElementById(`exercise-${exercise.id}`);
+    if (item) {
+      item.classList.remove("selected");
+      exercise.repetitions = 5; // Reset à la valeur par défaut
+    }
+  });
+
+  // Sélectionner les exercices de la séance
+  session.exercises.forEach((sessionExercise) => {
+    const exercise = exercises.find((e) => e.id === sessionExercise.id);
+    if (exercise) {
+      const item = document.getElementById(`exercise-${exercise.id}`);
+      if (item) {
+        item.classList.add("selected");
+        exercise.repetitions = sessionExercise.repetitions;
+      }
+    }
+  });
+
+  // Mettre à jour l'affichage des répétitions
+  updateExerciseRepetitionsDisplay();
+
+  // Basculer vers l'onglet de création et changer le bouton
+  showSeancesTab("creer-seance");
+
+  // Changer le bouton "Créer la séance" en "Modifier la séance"
+  const createButton = document.getElementById("createSessionBtn");
+  if (createButton) {
+    createButton.textContent = "✏️ Modifier la séance";
+    createButton.onclick = () => updateSession(sessionId);
+  }
+
+  // Ajouter un bouton "Annuler la modification"
+  const cancelButton = document.getElementById("cancelEditBtn");
+  if (cancelButton) {
+    cancelButton.style.display = "inline-block";
+  }
+}
+
+function updateExerciseRepetitionsDisplay() {
+  exercises.forEach((exercise) => {
+    const item = document.getElementById(`exercise-${exercise.id}`);
+    if (item && item.classList.contains("selected")) {
+      const repetitionsInput = item.querySelector(".repetitions-input");
+      if (repetitionsInput) {
+        repetitionsInput.value = exercise.repetitions;
+      }
+    }
+  });
+}
+
+function cancelEdit() {
+  // Réinitialiser le formulaire
+  document.getElementById("sessionName").value = "";
+  document.getElementById("sessionDate").value = "";
+  document.getElementById("seriesCount").value = "1";
+
+  // Désélectionner tous les exercices
+  exercises.forEach((exercise) => {
+    const item = document.getElementById(`exercise-${exercise.id}`);
+    if (item) {
+      item.classList.remove("selected");
+      exercise.repetitions = 5;
+    }
+  });
+
+  // Remettre le bouton original
+  const createButton = document.getElementById("createSessionBtn");
+  if (createButton) {
+    createButton.textContent = "➕ Créer la séance";
+    createButton.onclick = createSession;
+  }
+
+  // Cacher le bouton d'annulation
+  const cancelButton = document.getElementById("cancelEditBtn");
+  if (cancelButton) {
+    cancelButton.style.display = "none";
+  }
+
+  // Retourner à l'onglet "Mes séances"
+  showSeancesTab("mes-seances");
+}
+
+function updateSession(sessionId) {
+  const name = document.getElementById("sessionName").value.trim();
+  const date = document.getElementById("sessionDate").value;
+  const seriesCount =
+    parseInt(document.getElementById("seriesCount").value) || 1;
+
+  if (!name) {
+    showErrorModal("❌ Erreur", "Veuillez saisir un nom de séance", "❌");
+    return;
+  }
+
+  if (!date) {
+    showErrorModal("❌ Erreur", "Veuillez sélectionner une date", "❌");
+    return;
+  }
+
+  const selectedExercises = [];
+  exercises.forEach((exercise) => {
+    const item = document.getElementById(`exercise-${exercise.id}`);
+    if (item && item.classList.contains("selected")) {
+      selectedExercises.push({
+        id: exercise.id,
+        name: exercise.name,
+        unit: exercise.unit,
+        type: exercise.type,
+        repetitions: exercise.repetitions || 5,
+      });
+    }
+  });
+
+  if (selectedExercises.length === 0) {
+    showErrorModal(
+      "❌ Erreur",
+      "Veuillez sélectionner au moins un exercice",
+      "❌"
+    );
+    return;
+  }
+
+  const sessionIndex = sessions.findIndex((s) => s.id === sessionId);
+  if (sessionIndex !== -1) {
+    sessions[sessionIndex] = {
+      ...sessions[sessionIndex],
+      name: name,
+      date: date,
+      seriesCount: seriesCount,
+      exercises: selectedExercises,
+      updatedAt: new Date().toISOString(),
+    };
+
+    saveData();
+    updateInterface();
+
+    // Réinitialiser le formulaire
+    cancelEdit();
+
+    showSuccessModal("✅ Succès", "Séance modifiée avec succès !", "✅");
+  }
 }
 
 function startSession(sessionId) {
