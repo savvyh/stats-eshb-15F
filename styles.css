@@ -369,6 +369,103 @@ textarea {
   font-size: 13px;
 }
 
+/* Comparison Section */
+.checkbox-label {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  color: #2d3748;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: auto !important;
+  margin: 0;
+  cursor: pointer;
+  min-height: auto;
+}
+
+#comparisonSection {
+  margin: 20px 0;
+  padding: 20px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+#comparisonSection h4 {
+  margin: 0 0 15px 0;
+  color: #2d3748;
+  font-size: 16px;
+}
+
+.comparison-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 15px;
+  padding: 15px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.comparison-label {
+  font-weight: 500;
+  color: #2d3748;
+  min-width: 100px;
+  font-size: 14px;
+}
+
+.exercise-select {
+  flex: 1;
+  min-width: 200px;
+  padding: 8px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #ffffff;
+}
+
+.comparison-icon {
+  font-size: 18px;
+  color: #4299e1;
+  font-weight: bold;
+  margin: 0 8px;
+}
+
+/* Add Comparison Button */
+.add-comparison-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border: 2px solid #c6f6d5;
+  border-radius: 8px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  position: relative;
+  min-height: 44px;
+  margin: 0;
+}
+
+.add-icon {
+  font-size: 16px;
+  margin-right: 8px;
+  width: 20px;
+  text-align: center;
+  font-weight: bold;
+  color: #38a169;
+}
+
+.add-text {
+  font-weight: 500;
+  color: #38a169;
+  font-size: 13px;
+}
+
 .finish-training-btn:hover {
   border-color: #f56565;
   background: #fed7d7;
@@ -767,7 +864,7 @@ textarea {
 }
 
 .btn-icon.btn-danger {
-  background: #fed7d7;
+  background: transparent;
   color: #c53030;
 }
 
