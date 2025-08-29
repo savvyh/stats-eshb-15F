@@ -1848,8 +1848,253 @@ textarea {
     grid-template-columns: 1fr;
   }
 
+  /* Comparison Section Responsive */
+  #comparisonSection {
+    padding: 15px;
+    margin: 15px 0;
+  }
+
+  .comparison-item {
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .comparison-label {
+    min-width: auto;
+    text-align: center;
+  }
+
+  .exercise-select {
+    min-width: auto;
+    width: 100%;
+  }
+
+  .comparison-icon {
+    margin: 5px 0;
+  }
+
+  /* Add Comparison Button Responsive */
+  .add-comparison-btn {
+    min-height: 40px;
+    padding: 6px 10px;
+  }
+
+  .add-text {
+    font-size: 12px;
+  }
+
+  /* Finish Training Button Responsive */
+  .finish-training-btn {
+    min-height: 40px;
+    padding: 6px 10px;
+  }
+
+  .finish-text {
+    font-size: 12px;
+  }
+
+  /* Delete All Button Responsive */
+  .delete-all-btn {
+    min-height: 40px;
+    padding: 6px 10px;
+  }
+
+  .delete-text {
+    font-size: 12px;
+  }
+
+  /* Modal Responsive */
+  .modal-content {
+    margin: 10% auto;
+    width: 95%;
+    max-width: none;
+  }
+
+  .confirm-content,
+  .success-content,
+  .error-content {
+    margin: 20% auto;
+    padding: 25px;
+    width: 95%;
+  }
+
+  /* Session Interface Responsive */
+  .session-interface {
+    padding: 15px;
+  }
+
+  .session-header {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+
+  .session-config {
+    margin-bottom: 20px;
+  }
+
+  .players-selection {
+    grid-template-columns: 1fr;
+  }
+
+  .session-tabs {
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .session-tab {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
   .tools-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Very Small Screens (phones) */
+@media (max-width: 480px) {
+  .main-content {
+    padding: 15px;
+  }
+
+  .sidebar-header {
+    padding: 15px;
+  }
+
+  .sidebar-header h1 {
+    font-size: 1.2em;
+  }
+
+  .nav-item {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .nav-icon {
+    font-size: 14px;
+    margin-right: 6px;
+  }
+
+  .section-header h2 {
+    font-size: 1.5em;
+  }
+
+  .form-card,
+  .list-card {
+    padding: 15px;
+  }
+
+  .form-group label {
+    font-size: 13px;
+  }
+
+  input,
+  select,
+  textarea {
+    padding: 10px 12px;
+    font-size: 13px;
+    min-height: 40px;
+  }
+
+  .btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    min-height: 32px;
+  }
+
+  /* Comparison Section Very Small */
+  #comparisonSection {
+    padding: 12px;
+    margin: 12px 0;
+  }
+
+  .comparison-item {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .comparison-label {
+    font-size: 13px;
+  }
+
+  .exercise-select {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  /* Buttons Very Small */
+  .add-comparison-btn,
+  .finish-training-btn,
+  .delete-all-btn {
+    min-height: 36px;
+    padding: 5px 8px;
+  }
+
+  .add-text,
+  .finish-text,
+  .delete-text {
+    font-size: 11px;
+  }
+
+  /* Modal Very Small */
+  .modal-content {
+    margin: 5% auto;
+    width: 98%;
+  }
+
+  .confirm-content,
+  .success-content,
+  .error-content {
+    margin: 15% auto;
+    padding: 20px;
+    width: 98%;
+  }
+
+  /* Session Interface Very Small */
+  .session-interface {
+    padding: 10px;
+  }
+
+  .session-header h2 {
+    font-size: 1.3em;
+  }
+
+  .session-tab {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  /* Exercise Cards Very Small */
+  .exercise-selection-item {
+    padding: 12px;
+  }
+
+  .exercise-selection-item h4 {
+    font-size: 14px;
+  }
+
+  .exercise-selection-item p {
+    font-size: 11px;
+  }
+
+  /* Session Cards Very Small */
+  .session-card {
+    padding: 12px;
+  }
+
+  .session-title {
+    font-size: 1.1em;
+  }
+
+  .session-meta {
+    font-size: 12px;
+  }
+
+  .exercise-tag {
+    font-size: 10px;
+    padding: 2px 5px;
   }
 
   .stats-selectors {
