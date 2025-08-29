@@ -1881,7 +1881,7 @@ function updateExercisesSelection() {
   if (exercises.length === 0) {
     container.innerHTML = `
       <div class="no-data">
-        <p>Aucun exercice créé. Créez d'abord des exercices.</p>
+        <p>Aucun exercice créé.</p>
       </div>
     `;
     return;
@@ -1913,6 +1913,12 @@ function updateExercisesSelection() {
 function toggleExerciseSelection(exerciseId) {
   const item = document.getElementById(`exercise-${exerciseId}`);
   item.classList.toggle("selected");
+
+  // Mettre à jour les options de comparaison si la section est active
+  const comparisonEnabled = document.getElementById("enableComparison").checked;
+  if (comparisonEnabled) {
+    updateAllComparisonOptions();
+  }
 }
 
 function updateExerciseRepetitions(exerciseId, repetitions) {
@@ -1961,12 +1967,34 @@ function createSession() {
     return;
   }
 
+  // Récupérer les comparaisons
+  const comparisonEnabled = document.getElementById("enableComparison").checked;
+  const comparisons = [];
+
+  if (comparisonEnabled) {
+    const comparisonItems = document.querySelectorAll(".comparison-item");
+    comparisonItems.forEach((item, index) => {
+      const exerciseA = item.querySelector("select:first-of-type").value;
+      const exerciseB = item.querySelector("select:last-of-type").value;
+
+      if (exerciseA && exerciseB) {
+        comparisons.push({
+          id: index + 1,
+          exerciseA: exerciseA,
+          exerciseB: exerciseB,
+        });
+      }
+    });
+  }
+
   const session = {
     id: Date.now().toString(),
     name: name,
     date: date,
     seriesCount: seriesCount,
     exercises: selectedExercises,
+    comparisonEnabled: comparisonEnabled,
+    comparisons: comparisons,
     createdAt: new Date().toISOString(),
   };
 
@@ -2080,6 +2108,10 @@ function cancelEdit() {
     }
   });
 
+  // Réinitialiser les comparaisons
+  document.getElementById("enableComparison").checked = false;
+  toggleComparison();
+
   // Remettre le bouton original
   const createButton = document.getElementById("createSessionBtn");
   if (createButton) {
@@ -2095,6 +2127,104 @@ function cancelEdit() {
 
   // Retourner à l'onglet "Mes séances"
   showSeancesTab("mes-seances");
+}
+
+// ===== COMPARISON FUNCTIONS =====
+
+function toggleComparison() {
+  const enabled = document.getElementById("enableComparison").checked;
+  const section = document.getElementById("comparisonSection");
+  section.style.display = enabled ? "block" : "none";
+
+  if (enabled) {
+    addComparison(); // Ajouter la première comparaison
+  } else {
+    clearComparisons(); // Vider toutes les comparaisons
+  }
+}
+
+function addComparison() {
+  const comparisonsList = document.getElementById("comparisonsList");
+  const comparisonId = Date.now();
+
+  const comparisonHTML = `
+    <div class="comparison-item" id="comparison-${comparisonId}">
+      <span class="comparison-label">Comparaison ${
+        comparisonsList.children.length + 1
+      } :</span>
+      <select class="exercise-select" onchange="updateComparison(${comparisonId}, 'exerciseA', this.value)">
+        <option value="">Sélectionner un exercice</option>
+        ${generateExerciseOptions()}
+      </select>
+      <span class="comparison-icon">⚡</span>
+      <select class="exercise-select" onchange="updateComparison(${comparisonId}, 'exerciseB', this.value)">
+        <option value="">Sélectionner un exercice</option>
+        ${generateExerciseOptions()}
+      </select>
+      <button class="btn-icon btn-danger" onclick="removeComparison(${comparisonId})" title="Supprimer">
+        🗑️
+      </button>
+    </div>
+  `;
+
+  comparisonsList.insertAdjacentHTML("beforeend", comparisonHTML);
+}
+
+function generateExerciseOptions() {
+  // Récupérer seulement les exercices sélectionnés
+  const selectedExercises = [];
+  exercises.forEach((exercise) => {
+    const item = document.getElementById(`exercise-${exercise.id}`);
+    if (item && item.classList.contains("selected")) {
+      selectedExercises.push(exercise);
+    }
+  });
+
+  return selectedExercises
+    .map(
+      (exercise) => `<option value="${exercise.id}">${exercise.name}</option>`
+    )
+    .join("");
+}
+
+function updateComparison(comparisonId, field, exerciseId) {
+  // Cette fonction sera utilisée pour stocker les sélections
+  // On peut l'implémenter plus tard pour sauvegarder les comparaisons
+}
+
+function removeComparison(comparisonId) {
+  const comparison = document.getElementById(`comparison-${comparisonId}`);
+  if (comparison) {
+    comparison.remove();
+    updateComparisonNumbers();
+  }
+}
+
+function clearComparisons() {
+  const comparisonsList = document.getElementById("comparisonsList");
+  comparisonsList.innerHTML = "";
+}
+
+function updateComparisonNumbers() {
+  const comparisons = document.querySelectorAll(".comparison-item");
+  comparisons.forEach((comparison, index) => {
+    const label = comparison.querySelector(".comparison-label");
+    if (label) {
+      label.textContent = `Comparaison ${index + 1} :`;
+    }
+  });
+}
+
+function updateAllComparisonOptions() {
+  const comparisons = document.querySelectorAll(".comparison-item");
+  comparisons.forEach((comparison) => {
+    const selects = comparison.querySelectorAll(".exercise-select");
+    selects.forEach((select) => {
+      const currentValue = select.value;
+      select.innerHTML = `<option value="">Sélectionner un exercice</option>${generateExerciseOptions()}`;
+      select.value = currentValue; // Restaurer la valeur sélectionnée si elle existe encore
+    });
+  });
 }
 
 function updateSession(sessionId) {
