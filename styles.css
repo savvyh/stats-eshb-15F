@@ -1743,6 +1743,41 @@ textarea {
   .exercises-selection {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   }
+
+  /* Performance Section Tablet */
+  .stats-content {
+    padding: 20px;
+  }
+
+  .player-stat-card {
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+
+  .player-stat-card h4 {
+    font-size: 15px;
+  }
+
+  .stat-row {
+    margin-bottom: 10px;
+  }
+
+  .stat-label {
+    font-size: 13px;
+  }
+
+  .stat-value {
+    font-size: 13px;
+  }
+
+  .chart-container {
+    height: 300px;
+  }
+
+  .exercise-inputs {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -1858,11 +1893,20 @@ textarea {
     flex-direction: column;
     gap: 10px;
     padding: 12px;
+    position: relative;
   }
 
   .comparison-label {
     min-width: auto;
     text-align: center;
+    position: relative;
+  }
+
+  .comparison-item .btn-icon.btn-danger {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 10;
   }
 
   .exercise-select {
@@ -2095,6 +2139,77 @@ textarea {
   .exercise-tag {
     font-size: 10px;
     padding: 2px 5px;
+  }
+
+  /* Performance Section Responsive */
+  .stats-content {
+    padding: 15px;
+  }
+
+  .player-stat-card {
+    padding: 12px;
+    margin-bottom: 15px;
+  }
+
+  .player-stat-card h4 {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .stat-row {
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 8px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    min-width: auto;
+  }
+
+  .stat-value {
+    font-size: 12px;
+    text-align: left;
+  }
+
+  .no-data {
+    padding: 20px 15px;
+  }
+
+  .no-data h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  .no-data p {
+    font-size: 13px;
+  }
+
+  /* Charts Responsive */
+  .chart-container {
+    height: 250px;
+    margin: 15px 0;
+  }
+
+  /* Performance Inputs Responsive */
+  .exercise-inputs {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .input-group {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .input-group label {
+    font-size: 12px;
+  }
+
+  .input-group input {
+    padding: 8px 10px;
+    font-size: 13px;
+    min-height: 36px;
   }
 
   .stats-selectors {
